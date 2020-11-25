@@ -12,8 +12,6 @@ function App() {
   const login = (user, pass) => loginMethod(user, pass, setUser)
   const logout = () => logoutMethode(setUser, init)
 
-
-
   useEffect(() => {
     if(getUserByJwt()){
       setUser(getUserByJwt())

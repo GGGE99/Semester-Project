@@ -1,3 +1,3 @@
-export const loginURL = "http://localhost:8080/jpareststarter";
+export const loginURL = "https://marcge.dk/tomcat/SemesterProject";
 
-export const jokeURL = "http://localhost:8080/jpareststarter/api/jokes";
+export const jokeURL = "https://marcge.dk/tomcat/SemesterProject/api/jokes";
