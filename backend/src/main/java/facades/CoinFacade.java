@@ -11,6 +11,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,17 +26,23 @@ import java.util.concurrent.TimeoutException;
 import javax.persistence.EntityManagerFactory;
 import utils.FetchData;
 
-
 /**
  *
  * @author marcg
  */
 public class CoinFacade {
 
+    private static List<CoinDTO> coinsList = new ArrayList();
+    private static Date lastUpdate = new Date();
+
     private static EntityManagerFactory emf;
     private static CoinFacade instance;
     private static ExecutorService es = Executors.newCachedThreadPool();
     private static Gson GSON = new Gson();
+
+    SimpleDateFormat sdf
+            = new SimpleDateFormat(
+                    "dd-MM-yyyy HH:mm:ss");
 
     private CoinFacade() {
     }
@@ -53,16 +61,46 @@ public class CoinFacade {
     }
 
     public String GetAllCoins() throws IOException, InterruptedException, ExecutionException, TimeoutException {
-        String URL = "https://api.coinlore.net/api/tickers/";
+        FetchData crypto = new FetchData("https://api.coinlore.net/api/tickers/");
 
-        FetchData site = new FetchData(URL);
+        Future<String> cryptoFuture = es.submit(new CoinHandler(crypto));
 
-        Future<String> future = es.submit(new CoinHandler(site));
-        String results = (future.get(10, TimeUnit.SECONDS));
+        String cryptoResults = (cryptoFuture.get(10, TimeUnit.SECONDS));
 
-        Future<List<CoinDTO>> future1 = es.submit(new CoinStringHandler(results));
-
+        Future<List<CoinDTO>> future1 = es.submit(new CoinStringHandler(cryptoResults));
         List<CoinDTO> results1 = (future1.get(10, TimeUnit.SECONDS));
+
+        return GSON.toJson(results1);
+    }
+
+    public String GetAllCoinsWithCurrency(String param) throws IOException, InterruptedException, ExecutionException, TimeoutException, ParseException {
+        FetchData crypto = new FetchData("https://api.coinlore.net/api/tickers/");
+        FetchData currency = new FetchData("https://api.vatcomply.com/rates?base=USD");
+
+        Future<String> cryptoFuture = es.submit(new CoinHandler(crypto));
+        Future<String> currencyFuture = es.submit(new CoinHandler(currency));
+
+        String cryptoResults = (cryptoFuture.get(10, TimeUnit.SECONDS));
+        String currencyResults = (currencyFuture.get(10, TimeUnit.SECONDS));
+
+        JsonObject obj = GSON.fromJson(currencyResults, JsonObject.class);
+
+        Future<List<CoinDTO>> future1 = es.submit(new CoinStringHandler(cryptoResults));
+        List<CoinDTO> results1 = (future1.get(10, TimeUnit.SECONDS));
+
+        try {
+            for (CoinDTO coinDTO : results1) {
+                coinDTO.setCurrency(param);
+                coinDTO.setPrice(coinDTO.getPrice() * Double.parseDouble(obj.get("rates").getAsJsonObject().get(param).toString()));
+            }
+            System.out.println();
+        } catch (Exception e) {
+            System.out.println("err");
+        }
+
+        Date dt2 = new Date();
+        //TODO fix this :D
+//        System.out.println(sdf.parse(lastUpdate.toString()));
 
         return GSON.toJson(results1);
     }
