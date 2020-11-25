@@ -37,7 +37,7 @@ public class CryptoEndpoint {
 
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     private static final CoinFacade FACADE = CoinFacade.getCoinFacade(EMF);
-    
+
     @Context
     private UriInfo context;
 
@@ -55,5 +55,12 @@ public class CryptoEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public String GetAll() throws InterruptedException, ExecutionException, TimeoutException, IOException {
         return FACADE.GetAllCoins();
+    }
+
+    @GET
+    @Path("every")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String GetEvery() throws InterruptedException, ExecutionException, TimeoutException, IOException {
+        return FACADE.GetEveryCoins();
     }
 }

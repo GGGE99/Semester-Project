@@ -5,7 +5,8 @@
  */
 package rest;
 
-import facades.CoinFacade;
+import facades.CurrencyFacade;
+import java.io.IOException;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -24,7 +25,7 @@ import utils.EMF_Creator;
 public class CurrencyEndpoint {
 
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
-    private static final CoinFacade FACADE = CoinFacade.getCoinFacade(EMF);
+    private static final CurrencyFacade FACADE = CurrencyFacade.getCurrencyFacade(EMF);
 
     @Context
     private UriInfo context;
@@ -41,8 +42,8 @@ public class CurrencyEndpoint {
     @GET
     @Path("all")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getAll() {
-        return "{\"msg\":\"Hello anonymous\"}";
+    public String getAll() throws IOException {
+        return FACADE.getAll();
     }
 
 }

@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.nimbusds.jose.crypto.impl.AAD;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import javax.persistence.EntityManagerFactory;
 import utils.FetchData;
-import utils.JokeFinder;
+
 
 /**
  *
@@ -58,18 +57,54 @@ public class CoinFacade {
 
         FetchData site = new FetchData(URL);
 
-        Future<List<CoinDTO>> future = es.submit(new CoinHandler(site));
+        Future<String> future = es.submit(new CoinHandler(site));
+        String results = (future.get(10, TimeUnit.SECONDS));
 
-        List<CoinDTO> results = (future.get(10, TimeUnit.SECONDS));
+        Future<List<CoinDTO>> future1 = es.submit(new CoinStringHandler(results));
 
-        return GSON.toJson(results);
+        List<CoinDTO> results1 = (future1.get(10, TimeUnit.SECONDS));
+
+        return GSON.toJson(results1);
     }
 
+    public String GetEveryCoins() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        String URL = "https://api.coinlore.net/api/tickers/";
+
+        List<FetchData> sites = new ArrayList();
+        for (int i = 0; i < 51; i++) {
+            sites.add(new FetchData(URL + "?start=" + (i * 100) + "&limit=100"));
+        }
+
+        List<Future<String>> futures = new ArrayList();
+        for (FetchData fd : sites) {
+            CoinHandler ch = new CoinHandler(fd);
+            futures.add(es.submit(ch));
+        }
+
+        List<String> results = new ArrayList();
+        for (Future<String> future : futures) {
+            results.add(future.get(100, TimeUnit.SECONDS));
+        }
+
+        List<Future<List<CoinDTO>>> futuresRes = new ArrayList();
+        for (String result : results) {
+            CoinStringHandler csh = new CoinStringHandler(result);
+            futuresRes.add(es.submit(csh));
+        }
+
+        List<CoinDTO> ReturnResults = new ArrayList();
+        for (Future<List<CoinDTO>> future : futuresRes) {
+            List<CoinDTO> test = future.get(100, TimeUnit.SECONDS);
+            for (CoinDTO coinDTO : test) {
+                ReturnResults.add(coinDTO);
+            }
+
+        }
+        return GSON.toJson(ReturnResults);
+    }
 }
 
-class CoinHandler implements Callable<List<CoinDTO>> {
-
-    private static Gson GSON = new Gson();
+class CoinHandler implements Callable<String> {
 
     FetchData fd;
 
@@ -78,19 +113,32 @@ class CoinHandler implements Callable<List<CoinDTO>> {
     }
 
     @Override
-    public List<CoinDTO> call() throws Exception {
+    public String call() throws Exception {
         fd.get();
 
-        String results = fd.getJson();
-        JsonObject jo = GSON.fromJson(results, JsonObject.class);
+        return new String(fd.getJson());
+    }
+}
+
+class CoinStringHandler implements Callable<List<CoinDTO>> {
+
+    private static Gson GSON = new Gson();
+
+    String text;
+
+    CoinStringHandler(String text) {
+        this.text = text;
+    }
+
+    @Override
+    public List<CoinDTO> call() throws Exception {
+        JsonObject jo = GSON.fromJson(text, JsonObject.class);
         JsonArray arr = jo.getAsJsonArray("data");
         List<CoinDTO> coinsDTO = new ArrayList();
+        Date myDate = new Date();
 
         for (JsonElement jsonElement : arr) {
-            Date myDate = new Date();
-
             JsonObject obj = jsonElement.getAsJsonObject();
-
             CoinDTO coinDTO = new CoinDTO(
                     "USD",
                     obj.get("name").getAsString(),
@@ -98,7 +146,6 @@ class CoinHandler implements Callable<List<CoinDTO>> {
                     myDate,
                     obj.get("volume24").getAsDouble());
             coinsDTO.add(coinDTO);
-            System.out.println(coinDTO);
         }
 
         return coinsDTO;
