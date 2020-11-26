@@ -79,28 +79,29 @@ public class CryptoEndpointTest {
                 .body(notNullValue());
     }
 
-    @Disabled
+    
     @Test
     public void testGetCoin() {
         given()
                 .contentType("application/json")
                 .accept(ContentType.JSON)
                 .when()
-                .get("/crypto/bitcoin").then()
+                .get("/crypto/Bitcoin").then()
                 .statusCode(200)
-                .body("name", equalTo("bitcoin"));
+                .body("name", equalTo("Bitcoin"));
     }
 
-    @Disabled
+
     @Test
     public void testGetCoinWithCurrency() {
         given()
                 .contentType("application/json")
                 .accept(ContentType.JSON)
                 .when()
-                .get("/crypto/bitcoin/USD").then()
+                .get("/crypto/Bitcoin/USD").then()
                 .statusCode(200)
-                .body("currency", equalTo("1.0"));
+                .body("currency", equalTo("USD"))
+                .body("name", equalTo("Bitcoin"));
     }
 
     @Test
