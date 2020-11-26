@@ -37,8 +37,13 @@ import utils.EMF_Creator;
 @Path("crypto")
 public class CryptoEndpoint {
 
+    public CryptoEndpoint() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        FACADE = CoinFacade.getCoinFacade(EMF);
+    }
+
+    
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
-    private static final CoinFacade FACADE = CoinFacade.getCoinFacade(EMF);
+    private static CoinFacade FACADE;
 
     @Context
     private UriInfo context;
@@ -71,5 +76,12 @@ public class CryptoEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllWithCurrency(@PathParam("Currency") String currency) throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException {
         return FACADE.GetAllCoinsWithCurrency(currency);
+    }
+
+    @GET
+    @Path("{name}/{Currency}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getACoinWithCurrency(@PathParam("name") String name, @PathParam("Currency") String currency) throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException {
+        return FACADE.GetACoinWithCurrency(name, currency);
     }
 }

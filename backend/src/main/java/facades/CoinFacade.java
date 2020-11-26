@@ -10,11 +10,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import errorhandling.InvalidInputException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -34,6 +36,8 @@ public class CoinFacade {
 
     private static String everyCoinsList = "";
     private static Date lastUpdate = null;
+    private static HashMap<String, CoinDTO> coinsMap = new HashMap();
+    private static HashMap<String, String> currencies = new HashMap();
 
     private static EntityManagerFactory emf;
     private static CoinFacade instance;
@@ -44,7 +48,9 @@ public class CoinFacade {
             = new SimpleDateFormat(
                     "dd-MM-yyyy HH:mm:ss");
 
-    private CoinFacade() {
+    private CoinFacade() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        GetEveryCoins();
+        fetchCurrencies();
     }
 
     /**
@@ -52,12 +58,26 @@ public class CoinFacade {
      * @param _emf
      * @return the instance of this facade.
      */
-    public static CoinFacade getCoinFacade(EntityManagerFactory _emf) {
+    public static CoinFacade getCoinFacade(EntityManagerFactory _emf) throws IOException, InterruptedException, ExecutionException, TimeoutException {
         if (instance == null) {
             emf = _emf;
             instance = new CoinFacade();
         }
         return instance;
+    }
+
+    private void fetchCurrencies() throws InterruptedException, ExecutionException, TimeoutException {
+        FetchData currency = new FetchData("https://api.vatcomply.com/rates?base=USD");
+        Future<String> currencyFuture = es.submit(new CoinHandler(currency));
+        String currencyResults = (currencyFuture.get(10, TimeUnit.SECONDS));
+
+        JsonObject obj = GSON.fromJson(currencyResults, JsonObject.class);
+        String currencyString = obj.get("rates").getAsJsonObject().toString();
+        currencyString = currencyString.substring(1, currencyString.length() - 1);
+        String[] myArr = currencyString.split(",");
+        for (String string : myArr) {
+            currencies.put(string.substring(1, 4), string.substring(6, string.length()));
+        }
     }
 
     public String GetAllCoins() throws IOException, InterruptedException, ExecutionException, TimeoutException {
@@ -68,6 +88,18 @@ public class CoinFacade {
         List<CoinDTO> cryptoResults = (cryptoFuture.get(10, TimeUnit.SECONDS));
 
         return GSON.toJson(cryptoResults);
+    }
+
+    public String GetACoinWithCurrency(String name, String currency) throws IOException, InterruptedException, ExecutionException, TimeoutException, ParseException, InvalidInputException {
+        try {
+            CoinDTO coin = coinsMap.get(name);
+            double cur = Double.parseDouble(currencies.get(currency));
+            coin.setPrice(cur * coin.getPrice());
+            coin.setCurrency(currency);
+            return GSON.toJson(coin);
+        } catch (Exception e) {
+            throw new InvalidInputException(String.format("dadaasdasdasd", "sdasda"));
+        }
     }
 
     public String GetAllCoinsWithCurrency(String param) throws IOException, InterruptedException, ExecutionException, TimeoutException, ParseException {
@@ -82,8 +114,6 @@ public class CoinFacade {
         String currencyResults = (currencyFuture.get(10, TimeUnit.SECONDS));
 
         JsonObject obj = GSON.fromJson(currencyResults, JsonObject.class);
-
-        System.out.println("dasdasdasdasd");
 
         try {
             for (CoinDTO coinDTO : cryptoResults) {
@@ -112,7 +142,7 @@ public class CoinFacade {
         }
 
         if (diffMinutes > 10 || lastUpdate == null) {
-
+            coinsMap = new HashMap();
             List<FetchData> sites = new ArrayList();
             int incroment = 100;
             int maxloops = 5100;
@@ -132,6 +162,7 @@ public class CoinFacade {
                 List<CoinDTO> test = future.get(100, TimeUnit.SECONDS);
                 for (CoinDTO coinDTO : test) {
                     ReturnResults.add(coinDTO);
+                    coinsMap.put(coinDTO.getName(), coinDTO);
                 }
             }
             everyCoinsList = GSON.toJson(ReturnResults);
