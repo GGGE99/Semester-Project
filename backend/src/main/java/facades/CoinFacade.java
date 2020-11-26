@@ -32,8 +32,8 @@ import utils.FetchData;
  */
 public class CoinFacade {
 
-    private static List<CoinDTO> coinsList = new ArrayList();
-    private static Date lastUpdate = new Date();
+    private static String everyCoinsList = "";
+    private static Date lastUpdate = null;
 
     private static EntityManagerFactory emf;
     private static CoinFacade instance;
@@ -74,6 +74,7 @@ public class CoinFacade {
     }
 
     public String GetAllCoinsWithCurrency(String param) throws IOException, InterruptedException, ExecutionException, TimeoutException, ParseException {
+
         FetchData crypto = new FetchData("https://api.coinlore.net/api/tickers/");
         FetchData currency = new FetchData("https://api.vatcomply.com/rates?base=USD");
 
@@ -88,6 +89,8 @@ public class CoinFacade {
         Future<List<CoinDTO>> future1 = es.submit(new CoinStringHandler(cryptoResults));
         List<CoinDTO> results1 = (future1.get(10, TimeUnit.SECONDS));
 
+        System.out.println("dasdasdasdasd");
+
         try {
             for (CoinDTO coinDTO : results1) {
                 coinDTO.setCurrency(param);
@@ -97,48 +100,49 @@ public class CoinFacade {
         } catch (Exception e) {
             System.out.println("err");
         }
-
-        Date dt2 = new Date();
-        //TODO fix this :D
-//        System.out.println(sdf.parse(lastUpdate.toString()));
-
         return GSON.toJson(results1);
+
     }
 
     public String GetEveryCoins() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         String URL = "https://api.coinlore.net/api/tickers/";
 
-        List<FetchData> sites = new ArrayList();
-        for (int i = 0; i < 51; i++) {
-            sites.add(new FetchData(URL + "?start=" + (i * 100) + "&limit=100"));
+        Date now = new Date();
+        long diffMinutes = 0;
+        try {
+            Date d1 = sdf.parse(sdf.format(lastUpdate));
+            Date d2 = sdf.parse(sdf.format(now));
+            long diff = d2.getTime() - d1.getTime();
+            diffMinutes = diff / (60 * 1000) % 60;
+        } catch (Exception e) {
         }
 
-        List<Future<String>> futures = new ArrayList();
-        for (FetchData fd : sites) {
-            CoinHandler ch = new CoinHandler(fd);
-            futures.add(es.submit(ch));
-        }
-
-        List<String> results = new ArrayList();
-        for (Future<String> future : futures) {
-            results.add(future.get(100, TimeUnit.SECONDS));
-        }
-
-        List<Future<List<CoinDTO>>> futuresRes = new ArrayList();
-        for (String result : results) {
-            CoinStringHandler csh = new CoinStringHandler(result);
-            futuresRes.add(es.submit(csh));
-        }
-
-        List<CoinDTO> ReturnResults = new ArrayList();
-        for (Future<List<CoinDTO>> future : futuresRes) {
-            List<CoinDTO> test = future.get(100, TimeUnit.SECONDS);
-            for (CoinDTO coinDTO : test) {
-                ReturnResults.add(coinDTO);
+        if (diffMinutes > 10 || lastUpdate == null) {
+            
+            List<FetchData> sites = new ArrayList();
+            int incroment = 100;
+            int maxloops = 5100;
+            int loops = (int)(maxloops/incroment);
+            for (int i = 0; i < loops; i++) {
+                sites.add(new FetchData(URL + "?start=" + (i * incroment) + "&limit="+ incroment));
             }
 
+            List<Future<List<CoinDTO>>> futures = new ArrayList();
+            for (FetchData fd : sites) {
+                CoinStringHandler ch = new CoinStringHandler(fd);
+                futures.add(es.submit(ch));
+            }
+
+            List<CoinDTO> ReturnResults = new ArrayList();
+            for (Future<List<CoinDTO>> future : futures) {
+                List<CoinDTO> test = future.get(100, TimeUnit.SECONDS);
+                for (CoinDTO coinDTO : test) {
+                    ReturnResults.add(coinDTO);
+                }
+            }
+            everyCoinsList = GSON.toJson(ReturnResults);
         }
-        return GSON.toJson(ReturnResults);
+        return everyCoinsList;
     }
 }
 
@@ -162,14 +166,18 @@ class CoinStringHandler implements Callable<List<CoinDTO>> {
 
     private static Gson GSON = new Gson();
 
-    String text;
+    FetchData fd;
 
-    CoinStringHandler(String text) {
-        this.text = text;
+    CoinStringHandler(FetchData fd) {
+        this.fd = fd;
     }
 
     @Override
     public List<CoinDTO> call() throws Exception {
+        fd.get();
+        
+        String text = fd.getJson();
+        
         JsonObject jo = GSON.fromJson(text, JsonObject.class);
         JsonArray arr = jo.getAsJsonArray("data");
         List<CoinDTO> coinsDTO = new ArrayList();

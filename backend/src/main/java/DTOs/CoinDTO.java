@@ -79,27 +79,4 @@ public class CoinDTO {
         return "CoinDTO{" + "currency=" + currency + ", name=" + name + ", price=" + price + ", lastUpdated=" + lastUpdated + ", volume=" + volume + '}';
     }
 
-    public String getCurrency() {
-        return currency;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public String getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public double getVolume() {
-        return volume;
-    }
-    
-    
-    
-
 }
