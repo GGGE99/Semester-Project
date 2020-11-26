@@ -14,6 +14,7 @@ import java.util.concurrent.TimeoutException;
 import javax.persistence.EntityManagerFactory;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,7 +27,7 @@ public class CoinFacadeTest {
         private static CoinFacade facade = CoinFacade.getCoinFacade(emf);
     
     
-    
+    @Disabled
     @Test
     public void testGetAllCoins() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         String cDTOList = facade.GetAllCoins();
