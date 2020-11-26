@@ -18,16 +18,18 @@ public class CoinDTO {
     private double price;
     private String lastUpdated;
     private double volume;
+    private int rank;
 
     public CoinDTO() {
     }
 
-    public CoinDTO(String currency, String name, double price, Date lastUpdated, double volume) {
+    public CoinDTO(String currency, String name, double price, Date lastUpdated, double volume, int rank) {
         this.currency = currency;
         this.name = name;
         this.price = price;
         this.lastUpdated = lastUpdated.toString();
         this.volume = volume;
+        this.rank = rank;
     }
 
     public void setCurrency(String currency) {
@@ -49,8 +51,6 @@ public class CoinDTO {
     public void setVolume(double volume) {
         this.volume = volume;
     }
-    
-    
 
     public String getCurrency() {
         return currency;
@@ -71,8 +71,6 @@ public class CoinDTO {
     public double getVolume() {
         return volume;
     }
-    
-    
 
     @Override
     public String toString() {
