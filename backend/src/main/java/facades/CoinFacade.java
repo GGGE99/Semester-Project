@@ -102,6 +102,26 @@ public class CoinFacade {
         }
     }
 
+    public String getCoinByName(String name) throws IOException, InterruptedException, ExecutionException, TimeoutException, ParseException, InvalidInputException {
+        try {
+            CoinDTO coin = coinsMap.get(name);
+            return GSON.toJson(coin);
+        } catch (Exception e) {
+            throw new InvalidInputException(String.format("dadaasdasdasd", "sdasda"));
+        }
+    }
+
+    public String getCorrencyByName(String name) throws IOException, InterruptedException, ExecutionException, TimeoutException, ParseException, InvalidInputException {
+        try {
+            String cur = currencies.get(name);
+            JsonObject obj = new JsonObject();
+            obj.addProperty(name, cur);
+            return GSON.toJson(obj);
+        } catch (Exception e) {
+            throw new InvalidInputException(String.format("dadaasdasdasd", "sdasda"));
+        }
+    }
+
     public String GetAllCoinsWithCurrency(String param) throws IOException, InterruptedException, ExecutionException, TimeoutException, ParseException {
 
         FetchData crypto = new FetchData("https://api.coinlore.net/api/tickers/");

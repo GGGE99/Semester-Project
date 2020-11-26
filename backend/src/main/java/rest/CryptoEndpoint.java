@@ -42,7 +42,6 @@ public class CryptoEndpoint {
         FACADE = CoinFacade.getCoinFacade(EMF);
     }
 
-    
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     private static CoinFacade FACADE;
 
