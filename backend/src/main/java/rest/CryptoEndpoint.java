@@ -84,4 +84,11 @@ public class CryptoEndpoint {
     public String getACoinWithCurrency(@PathParam("name") String name, @PathParam("Currency") String currency) throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException, InvalidInputException {
         return FACADE.GetACoinWithCurrency(name, currency);
     }
+
+    @GET
+    @Path("{name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getACoinByName(@PathParam("name") String name) throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException, InvalidInputException {
+        return FACADE.getCoinByName(name);
+    }
 }
