@@ -8,6 +8,7 @@ package rest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import entities.User;
+import errorhandling.InvalidInputException;
 import facades.CoinFacade;
 import java.io.IOException;
 import java.text.ParseException;
@@ -81,7 +82,7 @@ public class CryptoEndpoint {
     @GET
     @Path("{name}/{Currency}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getACoinWithCurrency(@PathParam("name") String name, @PathParam("Currency") String currency) throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException {
+    public String getACoinWithCurrency(@PathParam("name") String name, @PathParam("Currency") String currency) throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException, InvalidInputException {
         return FACADE.GetACoinWithCurrency(name, currency);
     }
 }
