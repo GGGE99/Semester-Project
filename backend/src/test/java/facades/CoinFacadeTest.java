@@ -14,6 +14,7 @@ import java.util.concurrent.TimeoutException;
 import javax.persistence.EntityManagerFactory;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -22,11 +23,16 @@ import org.junit.jupiter.api.Test;
  * @author baske
  */
 public class CoinFacadeTest {
-       private static EntityManagerFactory emf;
-        private static Gson GSON = new Gson();
-        private static CoinFacade facade = CoinFacade.getCoinFacade(emf);
-    
-    
+
+    private static EntityManagerFactory emf;
+    private static Gson GSON = new Gson();
+    private static CoinFacade facade  = null;
+
+    @BeforeAll
+    public static void setUpClass() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        facade = CoinFacade.getCoinFacade(emf);
+    }
+
     @Disabled
     @Test
     public void testGetAllCoins() throws IOException, InterruptedException, ExecutionException, TimeoutException {
@@ -34,13 +40,10 @@ public class CoinFacadeTest {
         System.out.println("Test get coins");
         Boolean expResult = true;
 
-       
         String result = cDTOList;
-        
+
         assertEquals(expResult, result.contains("Bitcoin"));
         assertEquals(expResult, result.contains("Ethereum"));
     }
-    
-    
-    
+
 }
