@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import entities.User;
 import facades.CoinFacade;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -68,7 +69,7 @@ public class CryptoEndpoint {
     @GET
     @Path("all/{Currency}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getAllWithCurrency(@PathParam("Currency") String currency) throws InterruptedException, ExecutionException, TimeoutException, IOException {
+    public String getAllWithCurrency(@PathParam("Currency") String currency) throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException {
         return FACADE.GetAllCoinsWithCurrency(currency);
     }
 }
