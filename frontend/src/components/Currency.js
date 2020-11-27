@@ -10,8 +10,8 @@ export default function AllCurrency() {
     fetch(allCurrencyURL, options)
       .then(handleHttpErrors)
       .then((data) => {
-        console.log(data.rates);
-        setCurrency([{...data.rates}]);
+        console.log(data);
+        setCurrency({...data.rates});
       });
   }, []);
 

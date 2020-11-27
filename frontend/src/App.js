@@ -25,7 +25,7 @@ function App() {
         <Switch>
           <Container fluid>
             <Route path="/" exact>
-              <Home/>
+              <Currency />
             </Route>
             <Route path="/jokes">
               <Jokes />
