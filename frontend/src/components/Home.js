@@ -11,7 +11,7 @@ export default function AllCoins() {
     fetch(allCoinsURL, options)
       .then(handleHttpErrors)
       .then((data) => {
-        console.log(data.all);
+        console.log(data);
         setCoin([...data]);
       });
   }, []);
