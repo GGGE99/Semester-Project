@@ -220,5 +220,21 @@ public class LoginEndpointTest {
                 .body("code", equalTo(403))
                 .body("message", equalTo("Not authenticated - do login"));
     }
+    
+    @Test
+    @Disabled
+    public void testEditPassword() {
+        login("user", "test");
+
+        given()
+                .contentType("application/json")
+                .body("bfesbfsk")
+                .when()
+                .put("info/changePW")
+                .then()
+                .body("username", equalTo("user"))
+                .body("password", equalTo("hej"));
+
+    }
 
 }
