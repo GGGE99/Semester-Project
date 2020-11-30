@@ -33,7 +33,7 @@ public class CoinFacadeTest {
         facade = CoinFacade.getCoinFacade(emf);
     }
 
-    @Disabled
+    
     @Test
     public void testGetAllCoins() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         String cDTOList = facade.GetAllCoins();

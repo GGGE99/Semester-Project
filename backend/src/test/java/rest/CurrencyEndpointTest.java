@@ -41,7 +41,7 @@ public class CurrencyEndpointTest {
         return GrizzlyHttpServerFactory.createHttpServer(BASE_URI, rc);
     }
     
-        @BeforeAll
+    @BeforeAll
     public static void setUpClass() {
         //This method must be called before you request the EntityManagerFactory
         EMF_Creator.startREST_TestWithDB();
@@ -74,7 +74,6 @@ public class CurrencyEndpointTest {
     }
     
     @Test
-    @Disabled
     public void testGetCurrency() {
         given()
                 .contentType("application/json")
@@ -82,7 +81,7 @@ public class CurrencyEndpointTest {
                 .when()
                 .get("/currency/USD").then()
                 .statusCode(200)
-                .body("name",equalTo("USD"));
+                .body("USD",equalTo("1.0"));
     }
     
 }
