@@ -120,6 +120,7 @@ public class CryptoEndpointTest {
                 .body(containsString("DKK"));
     }
 
+    @Disabled
     @Test
     public void testGetEveryCoin() {
         given()
