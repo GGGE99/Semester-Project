@@ -1,5 +1,6 @@
 package rest;
 
+import DTOs.UserDTO;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -34,7 +35,7 @@ public class DemoResource {
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     private static final UserFacade facade = UserFacade.getUserFacade(EMF);
     private static Gson GSON = new Gson();
-    
+
     @Context
     private UriInfo context;
 
@@ -119,21 +120,27 @@ public class DemoResource {
 
         return obj.toString();
     }
-    
+
     @PUT
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     @Path("changePW")
     @RolesAllowed({"admin", "user"})
     public String editPW(String jsonString) throws AuthenticationException {
+        EntityManager em = EMF.createEntityManager();
         JsonObject obj = GSON.fromJson(jsonString, JsonObject.class);
         String oldPW = obj.get("oldPW").getAsString();
         String newPW = obj.get("newPW").getAsString();
-        
+        System.out.println(oldPW);
         String thisuser = securityContext.getUserPrincipal().getName();
         User albert = facade.getVeryfiedUser(thisuser, oldPW);
         albert.setUserPass(newPW);
-        
-        return GSON.toJson(albert);
+        em.getTransaction().begin();
+        em.merge(albert);
+        em.getTransaction().commit();
+
+        System.out.println(GSON.toJson(new UserDTO(albert)));
+
+        return null;
     }
 }
