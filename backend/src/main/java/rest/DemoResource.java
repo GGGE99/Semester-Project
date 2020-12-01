@@ -1,9 +1,11 @@
 package rest;
 
+import DTOs.UserDTO;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import entities.User;
+import facades.UserFacade;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
@@ -15,10 +17,13 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import security.UserPrincipal;
+import security.errorhandling.AuthenticationException;
 import utils.EMF_Creator;
 
 /**
@@ -28,6 +33,9 @@ import utils.EMF_Creator;
 public class DemoResource {
 
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
+    private static final UserFacade facade = UserFacade.getUserFacade(EMF);
+    private static Gson GSON = new Gson();
+
     @Context
     private UriInfo context;
 
@@ -111,5 +119,28 @@ public class DemoResource {
         obj.add("roles", array);
 
         return obj.toString();
+    }
+
+    @PUT
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Path("changePW")
+    @RolesAllowed({"admin", "user"})
+    public String editPW(String jsonString) throws AuthenticationException {
+        EntityManager em = EMF.createEntityManager();
+        JsonObject obj = GSON.fromJson(jsonString, JsonObject.class);
+        String oldPW = obj.get("oldPW").getAsString();
+        String newPW = obj.get("newPW").getAsString();
+        System.out.println(oldPW);
+        String thisuser = securityContext.getUserPrincipal().getName();
+        User albert = facade.getVeryfiedUser(thisuser, oldPW);
+        albert.setUserPass(newPW);
+        em.getTransaction().begin();
+        em.merge(albert);
+        em.getTransaction().commit();
+
+        System.out.println(GSON.toJson(new UserDTO(albert)));
+
+        return null;
     }
 }

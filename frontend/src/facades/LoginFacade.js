@@ -7,8 +7,7 @@ function apiFacade() {
       username: user,
       password: password,
     });
-    return fetch(URL + "/api/login", options)
-      .then(handleHttpErrors)
+    return fetch(URL + "/api/login", options).then(handleHttpErrors);
   };
 
   const signup = (username, password) => {

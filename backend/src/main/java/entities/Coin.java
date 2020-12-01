@@ -14,9 +14,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 @Entity
+@NamedQuery(name = "Coin.deleteAllRows", query = "DELETE from Coin")
+@NamedQuery(name = "Coin.getAllRows", query = "SELECT c from Coin c")
 public class Coin implements Serializable {
 
     private static final long serialVersionUID = 1L;
