@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { allCoinsURL } from "../utils/settings";
 import { makeOptions, handleHttpErrors } from "../utils/fetchUtils";
 import Table from "react-bootstrap/Table";
-import { Col, Row } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import Currency from "./Currency";
 
 export default function AllCoins() {
@@ -31,6 +31,25 @@ export default function AllCoins() {
       });
   }, []);
 
+  function compare(a, b) {
+    if (a < b) return 1;
+    else if (a > b) return -1;
+    return 0;
+  }
+
+  function sort(sortValue) {
+    if (sortValue === "price")
+      setCoin([...coin.sort((a, b) => compare(a.price, b.price))]);
+    else if (sortValue === "volume")
+      setCoin([...coin.sort((a, b) => compare(a.volume, b.volume))]);
+    else if (sortValue === "name")
+      setCoin([
+        ...coin.sort((a, b) =>
+          compare(b.name.toLowerCase(), a.name.toLowerCase())
+        ),
+      ]);
+  }
+
   return (
     <Row>
       <Col>
@@ -40,10 +59,16 @@ export default function AllCoins() {
         <Table>
           <thead>
             <tr>
-              <td>Name</td>
-              <td>Price</td>
+              <td onClick={() => sort("name")}>
+                <Button className="btn btn-warning">Name</Button>
+              </td>
+              <td onClick={() => sort("price")}>
+                <Button className="btn btn-warning">Price</Button>
+              </td>
+              <td onClick={() => sort("volume")}>
+                <Button className="btn btn-warning">Volume</Button>
+              </td>
               <td>Last Updated</td>
-              <td>Volume</td>
             </tr>
           </thead>
           <tbody>
@@ -54,8 +79,8 @@ export default function AllCoins() {
                   <td>
                     {p.price} {currency}
                   </td>
-                  <td>{p.lastUpdated}</td>
                   <td>{p.volume}</td>
+                  <td>{p.lastUpdated}</td>
                 </tr>
               );
             })}
