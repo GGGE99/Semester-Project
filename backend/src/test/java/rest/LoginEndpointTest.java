@@ -228,12 +228,13 @@ public class LoginEndpointTest {
 
         given()
                 .contentType("application/json")
-                .body("bfesbfsk")
+                .header("x-access-token", securityToken)
+                .body("{oldPW:test, newPW:1234}")
                 .when()
                 .put("info/changePW")
                 .then()
                 .body("username", equalTo("user"))
-                .body("password", equalTo("hej"));
+                .body("password", equalTo("1234"));
 
     }
 
