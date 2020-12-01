@@ -58,6 +58,12 @@ public class CryptoEndpointTest {
         RestAssured.baseURI = SERVER_URL;
         RestAssured.port = SERVER_PORT;
         RestAssured.defaultParser = Parser.JSON;
+
+        given()
+                .contentType("application/json")
+                .accept(ContentType.JSON)
+                .when()
+                .get("/crypto/all");
     }
 
     @AfterAll
@@ -116,12 +122,6 @@ public class CryptoEndpointTest {
 
     @Test
     public void testGetEveryCoin() {
-        given()
-                .contentType("application/json")
-                .accept(ContentType.JSON)
-                .when()
-                .get("/crypto/every");
-
         given()
                 .contentType("application/json")
                 .accept(ContentType.JSON)
