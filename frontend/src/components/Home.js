@@ -32,16 +32,22 @@ export default function AllCoins() {
   }, []);
 
   function compare(a, b) {
-    if (a < b) return 1
-    else if (a > b) return -1
-    return 0
+    if (a < b) return 1;
+    else if (a > b) return -1;
+    return 0;
   }
 
   function sort(sortValue) {
-    if (sortValue === "price") setCoin([...coin.sort((a, b) => compare(a.price, b.price))])
-    else if (sortValue === "volume") setCoin([...coin.sort((a, b) => compare(a.volume, b.volume))])
-    else if (sortValue === "name") setCoin([...coin.sort((a, b) => compare(a.name.toLowerCase(), b.name.toLowerCase()))])
-
+    if (sortValue === "price")
+      setCoin([...coin.sort((a, b) => compare(a.price, b.price))]);
+    else if (sortValue === "volume")
+      setCoin([...coin.sort((a, b) => compare(a.volume, b.volume))]);
+    else if (sortValue === "name")
+      setCoin([
+        ...coin.sort((a, b) =>
+          compare(b.name.toLowerCase(), a.name.toLowerCase())
+        ),
+      ]);
   }
 
   return (
@@ -50,14 +56,18 @@ export default function AllCoins() {
         <Currency currency={currency} setCurrency={setCurrency} />
       </Col>
       <Col>
-
         <Table>
           <thead>
             <tr>
-
-              <td onClick={() => sort("name")}><Button className="btn btn-warning">Name</Button></td>
-              <td onClick={() => sort("price")}><Button className="btn btn-warning">Price</Button></td>
-              <td onClick={() => sort("volume")}><Button className="btn btn-warning">Volume</Button></td>
+              <td onClick={() => sort("name")}>
+                <Button className="btn btn-warning">Name</Button>
+              </td>
+              <td onClick={() => sort("price")}>
+                <Button className="btn btn-warning">Price</Button>
+              </td>
+              <td onClick={() => sort("volume")}>
+                <Button className="btn btn-warning">Volume</Button>
+              </td>
               <td>Last Updated</td>
             </tr>
           </thead>
