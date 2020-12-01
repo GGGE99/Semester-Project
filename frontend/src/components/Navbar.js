@@ -15,6 +15,11 @@ function NavbarShow({ user, logout }) {
             Jokes
           </Link>
         </Nav>
+        <Nav className="mr-auto">
+          {user.username !== "" ? (<Link to="/personal" className="nav-link">
+            personal page
+          </Link>) : (<></>)}
+        </Nav>
         <Nav>
           {user.username !== "" ? (
             <>
@@ -24,10 +29,10 @@ function NavbarShow({ user, logout }) {
               </button>
             </>
           ) : (
-            <Link to="/signin">
-              <button className="btn btn-primary">Sign In</button>
-            </Link>
-          )}
+              <Link to="/signin">
+                <button className="btn btn-primary">Sign In</button>
+              </Link>
+            )}
         </Nav>
       </Navbar.Collapse>
     </Navbar>

@@ -44,14 +44,14 @@ function LoginDisplay({ login, user, logout }) {
               <Link to="/signup">Sign-up</Link>
             </>
           ) : (
-            <div>
-              <h1>username: {user.username}</h1>
+              <div>
+                <h1>username: {user.username}</h1>
 
-              <button className="btn btn-danger" onClick={logout}>
-                Logout
+                <button className="btn btn-danger" onClick={logout}>
+                  Logout
               </button>
-            </div>
-          )}
+              </div>
+            )}
         </Jumbotron>
       </Col>
       <Col></Col>
