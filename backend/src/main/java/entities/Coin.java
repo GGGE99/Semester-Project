@@ -44,4 +44,22 @@ public class Coin implements Serializable {
         values.add(coinValue);
     }
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<CoinValue> getValues() {
+        return values;
+    }
+    
+    
+
 }

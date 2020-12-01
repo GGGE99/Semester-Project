@@ -41,6 +41,26 @@ public class CoinValue implements Serializable {
     public void setCoin(Coin coin) {
         this.coin = coin;
     }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public Coin getCoin() {
+        return coin;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public Date getDate() {
+        return date;
+    }
     
     
 

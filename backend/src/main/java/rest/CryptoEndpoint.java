@@ -91,4 +91,12 @@ public class CryptoEndpoint {
     public String getACoinByName(@PathParam("name") String name) throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException, InvalidInputException {
         return FACADE.getCoinByName(name);
     }
+
+    @GET
+    @Path("history")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getHistoryForACoin() throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException, InvalidInputException {
+        return FACADE.getCoinHistory();
+    }
+
 }
