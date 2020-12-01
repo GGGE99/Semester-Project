@@ -79,7 +79,6 @@ public class CryptoEndpointTest {
                 .body(notNullValue());
     }
 
-    
     @Test
     public void testGetCoin() {
         given()
@@ -90,7 +89,6 @@ public class CryptoEndpointTest {
                 .statusCode(200)
                 .body("name", equalTo("Bitcoin"));
     }
-
 
     @Test
     public void testGetCoinWithCurrency() {
@@ -118,6 +116,12 @@ public class CryptoEndpointTest {
 
     @Test
     public void testGetEveryCoin() {
+        given()
+                .contentType("application/json")
+                .accept(ContentType.JSON)
+                .when()
+                .get("/crypto/every");
+
         given()
                 .contentType("application/json")
                 .accept(ContentType.JSON)

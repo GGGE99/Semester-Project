@@ -70,11 +70,6 @@ public class CoinFacade {
         );
     }
 
-    /**
-     *
-     * @param _emf
-     * @return the instance of this facade.
-     */
     public static CoinFacade getCoinFacade(EntityManagerFactory _emf) throws IOException, InterruptedException, ExecutionException, TimeoutException {
         if (instance == null) {
             emf = _emf;
@@ -95,6 +90,20 @@ public class CoinFacade {
         for (String string : myArr) {
             currencies.put(string.substring(1, 4), string.substring(6, string.length()));
         }
+    }
+    
+    
+    public String getCoinHistory(){
+        EntityManager em = emf.createEntityManager();
+        Coin coin1 = em.createQuery("SELECT c from Coin c where c.name = 'Bitcoin'", Coin.class).getSingleResult();
+        Coin coin = coins.get("Bitcoin");
+        List<CoinValue> vals = coin1.getValues();
+        
+        JsonObject obj = new JsonObject();
+        for (CoinValue val : vals) {
+            obj.addProperty(val.getDate().toString(), val.getPrice());
+        }
+        return obj.toString();
     }
 
     public String GetAllCoins() throws IOException, InterruptedException, ExecutionException, TimeoutException {
