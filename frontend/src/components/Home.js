@@ -69,13 +69,13 @@ export default function AllCoins() {
       setNameBool(false)
       setCoin([...coin.sort((a, b) => compareReverse(a.volume, b.volume))]);
     }
-    if (sortValue === "name" && !nameBool){
+    if (sortValue === "name" && !nameBool) {
       setPriceBool(false)
       setVolumeBool(false)
       setNameBool(true)
       setCoin([...coin.sort((a, b) => compare(b.name.toLowerCase(), a.name.toLowerCase())),]);
     }
-    else if(sortValue === "name" && nameBool){
+    else if (sortValue === "name" && nameBool) {
       setPriceBool(false)
       setVolumeBool(false)
       setNameBool(false)
