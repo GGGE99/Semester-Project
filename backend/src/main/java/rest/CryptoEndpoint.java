@@ -99,4 +99,11 @@ public class CryptoEndpoint {
         return FACADE.getCoinHistory();
     }
 
+    @GET
+    @Path("chart")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getChart() {
+        return FACADE.getChart();
+    }
+
 }

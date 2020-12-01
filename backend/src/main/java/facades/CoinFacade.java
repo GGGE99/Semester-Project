@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.nimbusds.jose.shaded.json.JSONArray;
 import entities.Coin;
 import entities.CoinValue;
 import errorhandling.InvalidInputException;
@@ -56,6 +57,44 @@ public class CoinFacade {
 
     ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
 
+    public String getChart() {
+        System.out.println("asdadasdasdasdasda");
+        EntityManager em = emf.createEntityManager();
+
+        TypedQuery<Coin> query = em.createQuery("SELECT c from Coin c WHERE c.name = 'Bitcoin'", Coin.class);
+        Coin coin = query.getSingleResult();
+
+        String url = "https://quickchart.io/chart?c=";
+//        String data = "";
+//        String labels = "";
+
+        JsonArray labels = new JsonArray();
+        JsonArray data = new JsonArray();
+        JsonArray datasets = new JsonArray();
+        JsonObject dataset = new JsonObject();
+        for (CoinValue value : coin.getValues()) {
+            data.add(value.getPrice());
+            labels.add(value.getDate().toString());
+        }
+
+        dataset.addProperty("label", "Bitcoin");
+        dataset.add("data", data);
+        dataset.addProperty("fill", false);
+        dataset.addProperty("borderColor", "blue");
+        datasets.add(dataset);
+
+        JsonObject chart = new JsonObject();
+        JsonObject data1 = new JsonObject();
+        data1.add("labels", labels);
+        data1.add("datasets", datasets);
+
+        chart.addProperty("type", "line");
+        chart.add("data", data1);
+
+        System.out.println(url + chart.toString());
+        return url + chart.toString();
+    }
+
     private CoinFacade() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         GetEveryCoin();
         fetchCurrencies();
@@ -91,14 +130,13 @@ public class CoinFacade {
             currencies.put(string.substring(1, 4), string.substring(6, string.length()));
         }
     }
-    
-    
-    public String getCoinHistory(){
+
+    public String getCoinHistory() {
         EntityManager em = emf.createEntityManager();
         Coin coin1 = em.createQuery("SELECT c from Coin c where c.name = 'Bitcoin'", Coin.class).getSingleResult();
         Coin coin = coins.get("Bitcoin");
         List<CoinValue> vals = coin1.getValues();
-        
+
         JsonObject obj = new JsonObject();
         for (CoinValue val : vals) {
             obj.addProperty(val.getDate().toString(), val.getPrice());
