@@ -10,6 +10,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import entities.Coin;
+import entities.CoinValue;
 import errorhandling.InvalidInputException;
 import java.io.IOException;
 import java.text.ParseException;
@@ -23,8 +25,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import utils.FetchData;
 
@@ -48,9 +52,20 @@ public class CoinFacade {
             = new SimpleDateFormat(
                     "dd-MM-yyyy HH:mm:ss");
 
+    ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+
     private CoinFacade() throws IOException, InterruptedException, ExecutionException, TimeoutException {
-        GetEveryCoins();
+        GetEveryCoin();
         fetchCurrencies();
+        ses.scheduleAtFixedRate(
+                new Runnable() {
+            @Override
+            public void run() {
+                addCoinsToDb(coinsMap);
+            }
+        },
+                0, 1, TimeUnit.MINUTES
+        );
     }
 
     /**
@@ -148,7 +163,7 @@ public class CoinFacade {
 
     }
 
-    public String GetEveryCoins() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+    public String GetEveryCoin() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         String URL = "https://api.coinlore.net/api/tickers/";
 
         Date now = new Date();
@@ -188,6 +203,19 @@ public class CoinFacade {
             everyCoinsList = GSON.toJson(ReturnResults);
         }
         return everyCoinsList;
+    }
+
+    private void addCoinsToDb(HashMap<String, CoinDTO> coinsDTO) {
+        EntityManager em = emf.createEntityManager();
+        Date date = new Date();
+        em.getTransaction().begin();
+        coinsDTO.forEach((k, coinDTO) -> {
+            Coin coin = new Coin(coinDTO.getName());
+            coin.addValue(new CoinValue(coinDTO.getPrice(), date));
+            em.persist(coin);
+        });
+        em.getTransaction().commit();
+
     }
 }
 

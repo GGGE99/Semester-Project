@@ -68,7 +68,7 @@ public class CryptoEndpoint {
     @Path("every")
     @Produces(MediaType.APPLICATION_JSON)
     public String GetEvery() throws InterruptedException, ExecutionException, TimeoutException, IOException {
-        return FACADE.GetEveryCoins();
+        return FACADE.GetEveryCoin();
     }
 
     @GET
