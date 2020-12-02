@@ -1,12 +1,26 @@
 package facades;
 
 import DTOs.UserDTO;
+import DTOs.UserInfoDTO;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import entities.Role;
 import entities.User;
+import entities.UserInfo;
 import errorhandling.InvalidInputException;
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
 import security.errorhandling.AuthenticationException;
 
 /**
@@ -16,10 +30,17 @@ public class UserFacade {
 
     private static EntityManagerFactory emf;
     private static UserFacade instance;
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private UserFacade() {
     }
 
+    
+    @Context
+    private UriInfo context;
+
+    @Context
+    SecurityContext securityContext;
     /**
      *
      * @param _emf
@@ -64,11 +85,16 @@ public class UserFacade {
         for (String role : userDTO.getRoles()) {
             user.addRole(new Role(role));
         }
+        user.getUserInfo();
+        
         em.getTransaction().begin();
         em.persist(user);
         em.getTransaction().commit();
 
         return new UserDTO(user);
     }
+    
+    
+
 
 }
