@@ -6,7 +6,7 @@ function NavbarShow({ user, logout }) {
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Link to="/" className="navbar-brand">
-        BANDEN <i className="fab fa-typo3" />
+        BIT BANDEN <i className="fab fa-typo3" />
       </Link>
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse id="responsive-navbar-nav">
@@ -14,14 +14,25 @@ function NavbarShow({ user, logout }) {
           <Link to="/jokes" className="nav-link">
             Jokes
           </Link>
-        </Nav>
-        <Nav className="mr-auto">
-          {user.username !== "" ? (<Link to="/personal" className="nav-link">
-            personal page
-          </Link>) : (<></>)}
+
+          {localStorage.getItem("jwtToken") ? (
+            <Link to="/profile" className="nav-link">
+              Profile
+            </Link>
+          ) : (
+            <></>
+          )}
+
+          {localStorage.getItem("jwtToken") ? (
+            <Link to="/settings" className="nav-link">
+              Settings
+            </Link>
+          ) : (
+            <></>
+          )}
         </Nav>
         <Nav>
-          {user.username !== "" ? (
+          {localStorage.getItem("jwtToken") ? (
             <>
               <h5 className="mr-2 text-light">{user.username}</h5>
               <button className="btn btn-danger" onClick={logout}>
@@ -29,10 +40,10 @@ function NavbarShow({ user, logout }) {
               </button>
             </>
           ) : (
-              <Link to="/signin">
-                <button className="btn btn-primary">Sign In</button>
-              </Link>
-            )}
+            <Link to="/signin">
+              <button className="btn btn-primary">Sign In</button>
+            </Link>
+          )}
         </Nav>
       </Navbar.Collapse>
     </Navbar>

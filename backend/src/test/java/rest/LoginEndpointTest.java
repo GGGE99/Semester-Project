@@ -222,7 +222,6 @@ public class LoginEndpointTest {
     }
     
     @Test
-    @Disabled
     public void testEditPassword() {
         login("user", "test");
 
@@ -233,8 +232,19 @@ public class LoginEndpointTest {
                 .when()
                 .put("info/changePW")
                 .then()
-                .body("username", equalTo("user"))
-                .body("password", equalTo("1234"));
+                .body("username", equalTo("user"));
+        
+        logOut();
+        
+        login("user", "1234");
+        
+        given()
+                .contentType("application/json")
+                .header("x-access-token", securityToken)
+                .when()
+                .get("/info/user").then()
+                .statusCode(200)
+                .body("name", equalTo("user"));
 
     }
 

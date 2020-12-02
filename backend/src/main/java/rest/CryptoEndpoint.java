@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import entities.User;
 import errorhandling.InvalidInputException;
+import facades.ChartFacade;
 import facades.CoinFacade;
 import java.io.IOException;
 import java.text.ParseException;
@@ -44,6 +45,7 @@ public class CryptoEndpoint {
 
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     private static CoinFacade FACADE;
+    private static ChartFacade chart;
 
     @Context
     private UriInfo context;
@@ -91,4 +93,19 @@ public class CryptoEndpoint {
     public String getACoinByName(@PathParam("name") String name) throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException, InvalidInputException {
         return FACADE.getCoinByName(name);
     }
+
+    @GET
+    @Path("history")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getHistoryForACoin() throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException, InvalidInputException {
+        return chart.getCoinHistory();
+    }
+
+    @GET
+    @Path("chart")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getChart() {
+        return FACADE.getChart();
+    }
+
 }

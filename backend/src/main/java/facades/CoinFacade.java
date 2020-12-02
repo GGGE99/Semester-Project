@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.nimbusds.jose.shaded.json.JSONArray;
 import entities.Coin;
 import entities.CoinValue;
 import errorhandling.InvalidInputException;
@@ -37,50 +38,81 @@ import utils.FetchData;
  *
  * @author marcg
  */
-public class CoinFacade {
+public final class CoinFacade {
+
+    private static CoinFacade instance;
+    private static ChartFacade caller;
+
+    private static Gson GSON = new Gson();
+    private static EntityManagerFactory emf;
+    private static ExecutorService es = Executors.newCachedThreadPool();
 
     private static String everyCoinsList = "";
     private static Date lastUpdate = null;
     private static HashMap<String, CoinDTO> coinsMap = new HashMap();
     private static HashMap<String, String> currencies = new HashMap();
-    private static HashMap<String, Coin> coins = new HashMap();
-
-    private static EntityManagerFactory emf;
-    private static CoinFacade instance;
-    private static ExecutorService es = Executors.newCachedThreadPool();
-    private static Gson GSON = new Gson();
 
     SimpleDateFormat sdf
             = new SimpleDateFormat(
                     "dd-MM-yyyy HH:mm:ss");
 
-    ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
-
-    private CoinFacade() throws IOException, InterruptedException, ExecutionException, TimeoutException {
-        GetEveryCoin();
-        fetchCurrencies();
-        ses.scheduleAtFixedRate(
-                new Runnable() {
-            @Override
-            public void run() {
-                addCoinsToDb(coinsMap);
-            }
-        },
-                0, 30, TimeUnit.MINUTES
-        );
-    }
-
-    /**
-     *
-     * @param _emf
-     * @return the instance of this facade.
-     */
     public static CoinFacade getCoinFacade(EntityManagerFactory _emf) throws IOException, InterruptedException, ExecutionException, TimeoutException {
         if (instance == null) {
             emf = _emf;
             instance = new CoinFacade();
+            caller = ChartFacade.getChartFacade(_emf, coinsMap);
         }
+
         return instance;
+    }
+    
+    public HashMap<String, CoinDTO> getCoinsMap() throws IOException, InterruptedException, ExecutionException, TimeoutException{
+        if(coinsMap.isEmpty()) GetEveryCoin();
+            
+        return coinsMap;
+    }
+
+    private CoinFacade() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        GetEveryCoin();
+        fetchCurrencies();
+    }
+
+    public String getChart() {
+
+        EntityManager em = emf.createEntityManager();
+
+        TypedQuery<Coin> query = em.createQuery("SELECT c from Coin c WHERE c.name = 'Bitcoin'", Coin.class);
+        Coin coin = query.getSingleResult();
+
+        String url = "https://quickchart.io/chart?c=";
+//        String data = "";
+//        String labels = "";
+
+        JsonArray labels = new JsonArray();
+        JsonArray data = new JsonArray();
+        JsonArray datasets = new JsonArray();
+        JsonObject dataset = new JsonObject();
+        for (CoinValue value : coin.getValues()) {
+            data.add(value.getPrice());
+            labels.add(value.getDate().toString());
+        }
+
+        dataset.addProperty("label", "Bitcoin");
+        dataset.add("data", data);
+        dataset.addProperty("fill", false);
+        dataset.addProperty("borderColor", "blue");
+        datasets.add(dataset);
+
+        JsonObject chart = new JsonObject();
+        JsonObject data1 = new JsonObject();
+        data1.add("labels", labels);
+        data1.add("datasets", datasets);
+
+        chart.addProperty("type", "line");
+        chart.add("data", data1);
+
+        System.out.println(url + chart.toString());
+        return url + chart.toString();
     }
 
     private void fetchCurrencies() throws InterruptedException, ExecutionException, TimeoutException {
@@ -205,35 +237,6 @@ public class CoinFacade {
             everyCoinsList = GSON.toJson(ReturnResults);
         }
         return everyCoinsList;
-    }
-
-    private void addCoinsToDb(HashMap<String, CoinDTO> coinsDTO) {
-        EntityManager em = emf.createEntityManager();
-
-        TypedQuery<Coin> query = em.createNamedQuery("Coin.getAllRows", Coin.class);
-        List<Coin> results = query.getResultList();
-        Date date = new Date();
-        System.out.println(results.size());
-
-        if (results.size() < 1) {
-            System.out.println("heahwehaehaheashhaesdasdasdasdasdasd");
-            em.getTransaction().begin();
-            coinsDTO.forEach((k, coinDTO) -> {
-                Coin coin = new Coin(coinDTO.getName());
-                coins.put(k, coin);
-                coin.addValue(new CoinValue(coinDTO.getPrice(), date));
-                em.persist(coin);
-            });
-            em.getTransaction().commit();
-        } else {
-            em.getTransaction().begin();
-            coinsDTO.forEach((k, coinDTO) -> {
-                Coin coin = coins.get(k);
-                coin.addValue(new CoinValue(coinDTO.getPrice(), date));
-                em.merge(coin);
-            });
-            em.getTransaction().commit();
-        }
     }
 }
 

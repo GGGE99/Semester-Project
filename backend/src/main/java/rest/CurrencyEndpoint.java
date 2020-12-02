@@ -37,7 +37,6 @@ public class CurrencyEndpoint {
     public CurrencyEndpoint() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         COINFACADE = CoinFacade.getCoinFacade(EMF);
     }
-    
 
     @Context
     private UriInfo context;

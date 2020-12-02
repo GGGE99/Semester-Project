@@ -145,7 +145,7 @@ public class UserResource {
 
         System.out.println(GSON.toJson(new UserDTO(albert)));
 
-        return null;
+        return GSON.toJson(new UserDTO(albert));
     }
     
     @POST

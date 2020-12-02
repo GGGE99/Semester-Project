@@ -8,6 +8,9 @@ import Currency from "./Currency";
 export default function AllCoins() {
   const [coin, setCoin] = useState([]);
   const [currency, setCurrency] = useState("");
+  const [nameBool, setNameBool] = useState(false)
+  const [priceBool, setPriceBool] = useState(false)
+  const [volumeBool, setVolumeBool] = useState(false)
 
   useEffect(() => {
     if (currency !== "") {
@@ -32,16 +35,52 @@ export default function AllCoins() {
   }, []);
 
   function compare(a, b) {
-    if (a < b) return 1
-    else if (a > b) return -1
-    return 0
+    if (a < b) return 1;
+    else if (a > b) return -1;
+    return 0;
   }
-
+  function compareReverse(a, b) {
+    if (a < b) return -1;
+    else if (a > b) return 1;
+    return 0;
+  }
   function sort(sortValue) {
-    if (sortValue === "price") setCoin([...coin.sort((a, b) => compare(a.price, b.price))])
-    else if (sortValue === "volume") setCoin([...coin.sort((a, b) => compare(a.volume, b.volume))])
-    else if (sortValue === "name") setCoin([...coin.sort((a, b) => compare(a.name.toLowerCase(), b.name.toLowerCase()))])
-
+    if (sortValue === "price" && !priceBool) {
+      setPriceBool(true)
+      setVolumeBool(false)
+      setNameBool(false)
+      setCoin([...coin.sort((a, b) => compare(a.price, b.price))]);
+    }
+    else if (sortValue === "price" && priceBool) {
+      setPriceBool(false)
+      setVolumeBool(false)
+      setNameBool(false)
+      setCoin([...coin.sort((a, b) => compareReverse(a.price, b.price))])
+    }
+    if (sortValue === "volume" && !volumeBool) {
+      setPriceBool(false)
+      setVolumeBool(true)
+      setNameBool(false)
+      setCoin([...coin.sort((a, b) => compare(a.volume, b.volume))]);
+    }
+    else if (sortValue === "volume" && volumeBool) {
+      setPriceBool(false)
+      setVolumeBool(false)
+      setNameBool(false)
+      setCoin([...coin.sort((a, b) => compareReverse(a.volume, b.volume))]);
+    }
+    if (sortValue === "name" && !nameBool) {
+      setPriceBool(false)
+      setVolumeBool(false)
+      setNameBool(true)
+      setCoin([...coin.sort((a, b) => compare(b.name.toLowerCase(), a.name.toLowerCase())),]);
+    }
+    else if (sortValue === "name" && nameBool) {
+      setPriceBool(false)
+      setVolumeBool(false)
+      setNameBool(false)
+      setCoin([...coin.sort((a, b) => compare(a.name.toLowerCase(), b.name.toLowerCase())),]);
+    }
   }
 
   return (
@@ -50,14 +89,18 @@ export default function AllCoins() {
         <Currency currency={currency} setCurrency={setCurrency} />
       </Col>
       <Col>
-
         <Table>
           <thead>
             <tr>
-
-              <td onClick={() => sort("name")}><Button className="btn btn-warning">Name</Button></td>
-              <td onClick={() => sort("price")}><Button className="btn btn-warning">Price</Button></td>
-              <td onClick={() => sort("volume")}><Button className="btn btn-warning">Volume</Button></td>
+              <td onClick={() => sort("name")}>
+                <Button className="btn btn-warning">Name</Button>
+              </td>
+              <td onClick={() => sort("price")}>
+                <Button className="btn btn-warning">Price</Button>
+              </td>
+              <td onClick={() => sort("volume")}>
+                <Button className="btn btn-warning">Volume</Button>
+              </td>
               <td>Last Updated</td>
             </tr>
           </thead>
