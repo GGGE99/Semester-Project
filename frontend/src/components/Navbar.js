@@ -16,12 +16,12 @@ function NavbarShow({ user, logout }) {
           </Link>
         </Nav>
         <Nav className="mr-auto">
-          {user.username !== "" ? (<Link to="/personal" className="nav-link">
+          {localStorage.getItem("jwtToken") ? (<Link to="/personal" className="nav-link">
             personal page
           </Link>) : (<></>)}
         </Nav>
         <Nav>
-          {user.username !== "" ? (
+          {localStorage.getItem("jwtToken") ? (
             <>
               <h5 className="mr-2 text-light">{user.username}</h5>
               <button className="btn btn-danger" onClick={logout}>

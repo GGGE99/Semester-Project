@@ -16,7 +16,7 @@ function apiFacade() {
       password,
     });
     return fetch(
-      "http://localhost:8080/jpareststarter/api/signup",
+      URL + "/api/signup",
       options
     ).then(handleHttpErrors);
   };
