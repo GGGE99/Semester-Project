@@ -50,19 +50,19 @@ public class ChartFacade {
     public ChartFacade() {
         ses.scheduleAtFixedRate(
                 () -> {
-            try {
-                addCoinsToDb();
-            } catch (IOException ex) {
-                Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ExecutionException ex) {
-                Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (TimeoutException ex) {
-                Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                    try {
+                        addCoinsToDb();
+                    } catch (IOException ex) {
+                        Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ExecutionException ex) {
+                        Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (TimeoutException ex) {
+                        Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 },
-                0, 30, TimeUnit.MINUTES
+                0, 1, TimeUnit.MINUTES
         );
     }
 
@@ -73,30 +73,46 @@ public class ChartFacade {
         try {
             TypedQuery<Coin> query = em.createNamedQuery("Coin.getAllRows", Coin.class);
             results = query.getResultList();
-        } catch(Exception e) {}
-        System.out.println("asdadasdasdasdasda");
+        } catch (Exception e) {
+        }
+        coinsMap = coinFacade.getCoinsMap();
+
         if (results.size() < 1) {
-            System.out.println("Hej");
-            coinsMap = coinFacade.getCoinsMap();
             em.getTransaction().begin();
             coinsMap.forEach((k, coinDTO) -> {
                 Coin coin = new Coin(coinDTO.getName());
                 coins.put(k, coin);
                 coin.addValue(new CoinValue(coinDTO.getPrice(), date));
                 em.persist(coin);
-                System.out.println(k);
             });
             em.getTransaction().commit();
         } else {
+            System.out.println(coinsMap.size());
+            if (coins.isEmpty()) {
+                getCoins();
+            }
+
             em.getTransaction().begin();
+
             coinsMap.forEach((k, coinDTO) -> {
                 Coin coin = coins.get(k);
                 coin.addValue(new CoinValue(coinDTO.getPrice(), date));
                 em.merge(coin);
             });
+            System.out.println("end");
+
             em.getTransaction().commit();
         }
         System.out.println("end");
+    }
+
+    public void getCoins() {
+        System.out.println(coinsMap);
+        coinsMap.forEach((k, coinDTO) -> {
+            Coin coin = new Coin(coinDTO.getName());
+            coins.put(k, coin);
+        });
+        System.out.println(coins);
     }
 
     public String getCoinHistory() {
