@@ -1,10 +1,14 @@
 package rest;
 
 import DTOs.UserDTO;
+import DTOs.UserInfoDTO;
+import DTOs.UserInfoListDTO;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import entities.User;
+import entities.UserInfo;
+import errorhandling.InvalidInputException;
 import facades.UserFacade;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
@@ -30,7 +34,7 @@ import utils.EMF_Creator;
  * @author lam@cphbusiness.dk
  */
 @Path("info")
-public class DemoResource {
+public class UserResource {
 
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     private static final UserFacade facade = UserFacade.getUserFacade(EMF);
@@ -143,4 +147,53 @@ public class DemoResource {
 
         return GSON.toJson(new UserDTO(albert));
     }
+    
+    @POST
+    @Path("info")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"admin", "user"})
+    public String makeUserInfo(String userInfoString) throws InvalidInputException {
+        String thisuser = securityContext.getUserPrincipal().getName();
+        UserInfoDTO userInfoDTO = GSON.fromJson(userInfoString, UserInfoDTO.class);
+        EntityManager em = EMF.createEntityManager();
+        System.out.println(userInfoString);
+        User user = null;
+
+        try {
+            TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.userName = :userName", User.class);
+            query.setParameter("userName", thisuser);
+            user = query.getSingleResult();
+            UserInfo userInfo = user.getUserInfo();
+
+            if (userInfo == null) {
+                userInfo = new UserInfo();
+                user.setUserInfo(userInfo);
+            }
+
+            userInfo.setInfo(userInfoDTO);
+            em.getTransaction().begin();
+            em.persist(user);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+
+        }
+
+        return GSON.toJson(new UserDTO(user));
+    }
+    
+     @GET
+    @Path("info")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"admin", "user"})
+    public String getUserInfo() throws InvalidInputException {
+        EntityManager em = EMF.createEntityManager();
+        String name = securityContext.getUserPrincipal().getName();
+            TypedQuery<UserInfo> query = em.createQuery("SELECT u FROM User u ", UserInfo.class);
+
+            List<UserInfo> users = query.getResultList();
+            UserInfoListDTO usersDTO = new UserInfoListDTO(users);
+            return GSON.toJson(usersDTO);
+}
 }
