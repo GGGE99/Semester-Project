@@ -38,7 +38,7 @@ import utils.FetchData;
  *
  * @author marcg
  */
-public class CoinFacade {
+public final class CoinFacade {
 
     private static String everyCoinsList = "";
     private static Date lastUpdate = null;
@@ -56,6 +56,58 @@ public class CoinFacade {
                     "dd-MM-yyyy HH:mm:ss");
 
     ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+
+    public static CoinFacade getCoinFacade(EntityManagerFactory _emf) throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        if (instance == null) {
+            emf = _emf;
+            instance = new CoinFacade();
+        }
+        return instance;
+    }
+
+    private CoinFacade() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        GetEveryCoin();
+        fetchCurrencies();
+        ses.scheduleAtFixedRate(() -> {
+            addCoinsToDb(coinsMap);
+        },
+                0, 30, TimeUnit.MINUTES
+        );
+    }
+
+    private void startDB(HashMap<String, CoinDTO> coinsDTO) {
+    
+    
+    }
+
+    
+
+    private void addCoinsToDb(HashMap<String, CoinDTO> coinsDTO) {
+        EntityManager em = emf.createEntityManager();
+        Date date = new Date();
+
+        TypedQuery<Coin> query = em.createNamedQuery("Coin.getAllRows", Coin.class);
+        List<Coin> results = query.getResultList();
+
+        if (results.size() < 1) {
+            em.getTransaction().begin();
+            coinsDTO.forEach((k, coinDTO) -> {
+                Coin coin = new Coin(coinDTO.getName());
+                coins.put(k, coin);
+                coin.addValue(new CoinValue(coinDTO.getPrice(), date));
+                em.persist(coin);
+            });
+            em.getTransaction().commit();
+        } else {
+            em.getTransaction().begin();
+            coinsDTO.forEach((k, coinDTO) -> {
+                Coin coin = coins.get(k);
+                coin.addValue(new CoinValue(coinDTO.getPrice(), date));
+                em.merge(coin);
+            });
+            em.getTransaction().commit();
+        }
+    }
 
     public String getChart() {
         System.out.println("asdadasdasdasdasda");
@@ -93,28 +145,6 @@ public class CoinFacade {
 
         System.out.println(url + chart.toString());
         return url + chart.toString();
-    }
-
-    private CoinFacade() throws IOException, InterruptedException, ExecutionException, TimeoutException {
-        GetEveryCoin();
-        fetchCurrencies();
-        ses.scheduleAtFixedRate(
-                new Runnable() {
-            @Override
-            public void run() {
-                addCoinsToDb(coinsMap);
-            }
-        },
-                0, 30, TimeUnit.MINUTES
-        );
-    }
-
-    public static CoinFacade getCoinFacade(EntityManagerFactory _emf) throws IOException, InterruptedException, ExecutionException, TimeoutException {
-        if (instance == null) {
-            emf = _emf;
-            instance = new CoinFacade();
-        }
-        return instance;
     }
 
     private void fetchCurrencies() throws InterruptedException, ExecutionException, TimeoutException {
@@ -252,35 +282,6 @@ public class CoinFacade {
             everyCoinsList = GSON.toJson(ReturnResults);
         }
         return everyCoinsList;
-    }
-
-    private void addCoinsToDb(HashMap<String, CoinDTO> coinsDTO) {
-        EntityManager em = emf.createEntityManager();
-
-        TypedQuery<Coin> query = em.createNamedQuery("Coin.getAllRows", Coin.class);
-        List<Coin> results = query.getResultList();
-        Date date = new Date();
-        System.out.println(results.size());
-
-        if (results.size() < 1) {
-            System.out.println("heahwehaehaheashhaesdasdasdasdasdasd");
-            em.getTransaction().begin();
-            coinsDTO.forEach((k, coinDTO) -> {
-                Coin coin = new Coin(coinDTO.getName());
-                coins.put(k, coin);
-                coin.addValue(new CoinValue(coinDTO.getPrice(), date));
-                em.persist(coin);
-            });
-            em.getTransaction().commit();
-        } else {
-            em.getTransaction().begin();
-            coinsDTO.forEach((k, coinDTO) -> {
-                Coin coin = coins.get(k);
-                coin.addValue(new CoinValue(coinDTO.getPrice(), date));
-                em.merge(coin);
-            });
-            em.getTransaction().commit();
-        }
     }
 }
 
