@@ -6,7 +6,7 @@ function NavbarShow({ user, logout }) {
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Link to="/" className="navbar-brand">
-        BANDEN <i className="fab fa-typo3" />
+        BIT BANDEN <i className="fab fa-typo3" />
       </Link>
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse id="responsive-navbar-nav">
@@ -14,11 +14,22 @@ function NavbarShow({ user, logout }) {
           <Link to="/jokes" className="nav-link">
             Jokes
           </Link>
-        </Nav>
-        <Nav className="mr-auto">
-          {localStorage.getItem("jwtToken") ? (<Link to="/personal" className="nav-link">
-            personal page
-          </Link>) : (<></>)}
+
+          {localStorage.getItem("jwtToken") ? (
+            <Link to="/profile" className="nav-link">
+              Profile
+            </Link>
+          ) : (
+            <></>
+          )}
+
+          {localStorage.getItem("jwtToken") ? (
+            <Link to="/settings" className="nav-link">
+              Settings
+            </Link>
+          ) : (
+            <></>
+          )}
         </Nav>
         <Nav>
           {localStorage.getItem("jwtToken") ? (
@@ -29,10 +40,10 @@ function NavbarShow({ user, logout }) {
               </button>
             </>
           ) : (
-              <Link to="/signin">
-                <button className="btn btn-primary">Sign In</button>
-              </Link>
-            )}
+            <Link to="/signin">
+              <button className="btn btn-primary">Sign In</button>
+            </Link>
+          )}
         </Nav>
       </Navbar.Collapse>
     </Navbar>
