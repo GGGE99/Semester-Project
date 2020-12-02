@@ -18,6 +18,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
@@ -48,13 +50,23 @@ public class ChartFacade {
     public ChartFacade() {
         ses.scheduleAtFixedRate(
                 () -> {
-                    addCoinsToDb();
+            try {
+                addCoinsToDb();
+            } catch (IOException ex) {
+                Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ExecutionException ex) {
+                Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (TimeoutException ex) {
+                Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
+            }
                 },
                 0, 30, TimeUnit.MINUTES
         );
     }
 
-    private void addCoinsToDb() {
+    private void addCoinsToDb() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         EntityManager em = emf.createEntityManager();
         Date date = new Date();
         List<Coin> results = null;
