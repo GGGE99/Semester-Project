@@ -6,6 +6,7 @@
 package DTOs;
 
 import entities.User;
+import entities.UserInfo;
 import java.util.List;
 
 /**
@@ -17,6 +18,8 @@ public class UserDTO {
     private String username;
     private String password;
     private List<String> roles;
+    private String favoriteBitcoin;
+    private String favoriteCurrency;
 
     public UserDTO(String name, String password, List<String> roles ) {
         this.username = name;
@@ -27,7 +30,26 @@ public class UserDTO {
     public UserDTO(User user) {
         this.username = user.getUserName();
         this.roles = user.getRolesAsStrings();
+        this.favoriteBitcoin = user.getUserInfo().getFavoriteBitcoin();
+        this.favoriteCurrency = user.getUserInfo().getFavoriteCurrency();
     }
+
+    public String getFavoriteBitcoin() {
+        return favoriteBitcoin;
+    }
+
+    public void setFavoriteBitcoin(String favoriteBitcoin) {
+        this.favoriteBitcoin = favoriteBitcoin;
+    }
+
+    public String getFavoriteCurrency() {
+        return favoriteCurrency;
+    }
+
+    public void setFavoriteCurrency(String favoriteCurrency) {
+        this.favoriteCurrency = favoriteCurrency;
+    }
+    
 
     public String getName() {
         return username;
