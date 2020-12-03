@@ -149,7 +149,7 @@ public class UserResource {
     }
     
     @POST
-    @Path("info")
+    @Path("favorites")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"admin", "user"})
@@ -183,7 +183,7 @@ public class UserResource {
     }
     
      @GET
-    @Path("info")
+    @Path("favorites")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"admin", "user"})
