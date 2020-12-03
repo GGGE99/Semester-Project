@@ -1,9 +1,11 @@
 package utils;
 
+import DTOs.UserInfoDTO;
 import entities.Coin;
 import entities.CoinValue;
 import entities.Role;
 import entities.User;
+import entities.UserInfo;
 import java.util.Date;
 
 import javax.persistence.EntityManager;
@@ -29,10 +31,12 @@ public class SetupTestUsers {
         Coin coin3 = new Coin("Bitcoin2");
         Coin coin4 = new Coin("Bitcoin3");
         Coin coin5 = new Coin("Bitcoin4");
+        
 
         if (admin.getUserPass().equals("test") || user.getUserPass().equals("test") || both.getUserPass().equals("test")) {
             throw new UnsupportedOperationException("You have not changed the passwords");
         }
+        
 
         em.getTransaction().begin();
         Role userRole = new Role("user");

@@ -221,6 +221,7 @@ public class LoginEndpointTest {
                 .body("message", equalTo("Not authenticated - do login"));
     }
     
+    @Disabled
     @Test
     public void testEditPassword() {
         login("user", "test");

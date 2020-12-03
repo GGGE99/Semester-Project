@@ -11,7 +11,7 @@ import Profile from "./components/Profile";
 function App() {
   const init = { username: "", roles: [] };
   const [user, setUser] = useState({ ...init });
-  const [fav, setFav] = useState({ favCoin: "", FavCurrency: "" });
+  const [fav, setFav] = useState({ favCoin: "", favCurrency: "" });
   const login = (user, pass) => loginMethod(user, pass, setUser);
   const logout = () => logoutMethode(setUser, init);
   const changePassword = (oldPW, newPW) => changePW(oldPW, newPW);

@@ -13,33 +13,33 @@ import entities.UserInfo;
  * @author Marcus
  */
 public class UserInfoDTO {
-    private String favoriteCurrecny;
-    private String favoriteBitcoin;
+    private String favCurrency;
+    private String favCoin;
 
-    public UserInfoDTO(String favoriteCurrecny, String favoriteBitcoin) {
-        this.favoriteCurrecny = favoriteCurrecny;
-        this.favoriteBitcoin = favoriteBitcoin;
+    public UserInfoDTO(String favCurrency, String favCoin) {
+        this.favCurrency = favCurrency;
+        this.favCoin = favCoin;
     }
     public UserInfoDTO(UserInfo userInfo) {
-        this.favoriteBitcoin = userInfo.getFavoriteBitcoin();
-        this.favoriteCurrecny = userInfo.getFavoriteCurrency();
+        this.favCoin = userInfo.getFavoriteBitcoin();
+        this.favCurrency = userInfo.getFavoriteCurrency();
     }
         
 
     public String getFavoriteCurrecny() {
-        return favoriteCurrecny;
+        return favCurrency;
     }
 
     public void setFavoriteCurrecny(String favoriteCurrecny) {
-        this.favoriteCurrecny = favoriteCurrecny;
+        this.favCurrency = favoriteCurrecny;
     }
 
     public String getFavoriteBitcoin() {
-        return favoriteBitcoin;
+        return favCoin;
     }
 
-    public void setFavoriteBitcoin(String favoriteBitcoin) {
-        this.favoriteBitcoin = favoriteBitcoin;
+    public void setFavoriteBitcoin(String favCoin) {
+        this.favCoin = favCoin;
     }
     
     
