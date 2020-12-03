@@ -39,7 +39,7 @@ public class DBtimer {
 
     private static ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
 
-    public static DBtimer getChartFacade(EntityManagerFactory _emf, HashMap<String, CoinDTO> _coinsMap) throws IOException, InterruptedException, ExecutionException, TimeoutException {
+    public static DBtimer getChartFacade(EntityManagerFactory _emf) throws IOException, InterruptedException, ExecutionException, TimeoutException {
         if (instance == null) {
             emf = _emf;
             instance = new DBtimer();

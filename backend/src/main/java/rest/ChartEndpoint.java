@@ -69,4 +69,13 @@ public class ChartEndpoint {
     public String getChartData() {
         return FACADE.getChartData();
     }
+
+    @GET
+    @Path("start")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String startHistory() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+       DBtimer.getChartFacade(EMF);
+       
+       return "{msg: \"history started \"}";
+    }
 }

@@ -42,7 +42,6 @@ import utils.FetchData;
 public final class CoinFacade {
 
     private static CoinFacade instance;
-    private static DBtimer caller;
 
     private static Gson GSON = new Gson();
     private static EntityManagerFactory emf;
@@ -61,7 +60,7 @@ public final class CoinFacade {
         if (instance == null) {
             emf = _emf;
             instance = new CoinFacade();
-            caller = DBtimer.getChartFacade(_emf, coinsMap);
+
         }
 
         return instance;
