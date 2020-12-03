@@ -182,18 +182,24 @@ public class UserResource {
         return GSON.toJson(new UserDTO(user));
     }
     
-     @GET
+
+    @GET
     @Path("favorites")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @RolesAllowed({"admin", "user"})
     public String getUserInfo() throws InvalidInputException {
         EntityManager em = EMF.createEntityManager();
+        
         String name = securityContext.getUserPrincipal().getName();
-            TypedQuery<UserInfo> query = em.createQuery("SELECT u FROM User u ", UserInfo.class);
+            TypedQuery<UserInfo> query = em.createQuery("SELECT u.userInfo FROM User u where u.userName=:userName", UserInfo.class);
+            query.setParameter("userName", name);
+            
+            UserInfo userInfo = null;
+            userInfo = query.getSingleResult();
 
-            List<UserInfo> users = query.getResultList();
-            UserInfoListDTO usersDTO = new UserInfoListDTO(users);
-            return GSON.toJson(usersDTO);
+            //List<UserInfo> users = query.getResultList();
+            UserInfoDTO userInfoDTO = new UserInfoDTO(userInfo);
+            return GSON.toJson(userInfoDTO);
 }
 }
