@@ -248,5 +248,22 @@ public class LoginEndpointTest {
                 .body("name", equalTo("user"));
 
     }
+    
+    @Test
+    @Disabled
+    public void testMakeUserInfo() {
+        login("user", "test");
+
+        given()
+                .contentType("application/json")
+                .header("x-access-token", securityToken)
+                .body("{favCoin:BitCoin, favCurrency:DKK}")
+                .when()
+                .put("info")
+                .then()
+                .body("username", equalTo("user"));
+
+    }
+
 
 }
