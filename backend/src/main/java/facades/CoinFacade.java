@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -41,7 +42,7 @@ import utils.FetchData;
 public final class CoinFacade {
 
     private static CoinFacade instance;
-    private static ChartFacade caller;
+    private static DBtimer caller;
 
     private static Gson GSON = new Gson();
     private static EntityManagerFactory emf;
@@ -60,59 +61,23 @@ public final class CoinFacade {
         if (instance == null) {
             emf = _emf;
             instance = new CoinFacade();
-            caller = ChartFacade.getChartFacade(_emf, coinsMap);
+            caller = DBtimer.getChartFacade(_emf, coinsMap);
         }
 
         return instance;
     }
-    
-    public HashMap<String, CoinDTO> getCoinsMap() throws IOException, InterruptedException, ExecutionException, TimeoutException{
-        if(coinsMap.isEmpty()) GetEveryCoin();
-            
+
+    public HashMap<String, CoinDTO> getCoinsMap() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        if (coinsMap.isEmpty()) {
+            GetEveryCoin();
+        }
+
         return coinsMap;
     }
 
     private CoinFacade() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         GetEveryCoin();
         fetchCurrencies();
-    }
-
-    public String getChart() {
-
-        EntityManager em = emf.createEntityManager();
-
-        TypedQuery<Coin> query = em.createQuery("SELECT c from Coin c WHERE c.name = 'Bitcoin'", Coin.class);
-        Coin coin = query.getSingleResult();
-
-        String url = "https://quickchart.io/chart?c=";
-//        String data = "";
-//        String labels = "";
-
-        JsonArray labels = new JsonArray();
-        JsonArray data = new JsonArray();
-        JsonArray datasets = new JsonArray();
-        JsonObject dataset = new JsonObject();
-        for (CoinValue value : coin.getValues()) {
-            data.add(value.getPrice());
-            labels.add(value.getDate().toString());
-        }
-
-        dataset.addProperty("label", "Bitcoin");
-        dataset.add("data", data);
-        dataset.addProperty("fill", false);
-        dataset.addProperty("borderColor", "blue");
-        datasets.add(dataset);
-
-        JsonObject chart = new JsonObject();
-        JsonObject data1 = new JsonObject();
-        data1.add("labels", labels);
-        data1.add("datasets", datasets);
-
-        chart.addProperty("type", "line");
-        chart.add("data", data1);
-
-        System.out.println(url + chart.toString());
-        return url + chart.toString();
     }
 
     private void fetchCurrencies() throws InterruptedException, ExecutionException, TimeoutException {

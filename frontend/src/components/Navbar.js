@@ -15,6 +15,10 @@ function NavbarShow({ user, logout }) {
             Jokes
           </Link>
 
+          <Link to="/charts" className="nav-link">
+            Charts
+          </Link>
+
           {localStorage.getItem("jwtToken") ? (
             <Link to="/profile" className="nav-link">
               Profile

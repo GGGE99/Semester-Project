@@ -6,20 +6,16 @@
 package facades;
 
 import DTOs.CoinDTO;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import entities.Coin;
 import entities.CoinValue;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
@@ -32,99 +28,75 @@ public class ChartFacade {
 
     private static ChartFacade instance;
     private static EntityManagerFactory emf;
-    private static CoinFacade coinFacade;
-    private static HashMap<String, Coin> coins = new HashMap();
-    private static HashMap<String, CoinDTO> coinsMap;
 
+//    private static HashMap<String, Coin> coins = new HashMap();
+//    private static HashMap<String, CoinDTO> coinsMap;
     ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
 
-    public static ChartFacade getChartFacade(EntityManagerFactory _emf, HashMap<String, CoinDTO> _coinsMap) throws IOException, InterruptedException, ExecutionException, TimeoutException {
+    public static ChartFacade getChartFacade(EntityManagerFactory _emf) {
         if (instance == null) {
             emf = _emf;
             instance = new ChartFacade();
-            coinFacade = CoinFacade.getCoinFacade(emf);
         }
         return instance;
     }
 
-    public ChartFacade() {
-        ses.scheduleAtFixedRate(
-                () -> {
-                    try {
-                        addCoinsToDb();
-                    } catch (IOException ex) {
-                        Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (ExecutionException ex) {
-                        Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (TimeoutException ex) {
-                        Logger.getLogger(ChartFacade.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                },
-                0, 1, TimeUnit.MINUTES
-        );
-    }
+    public String getChart() {
 
-    private void addCoinsToDb() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         EntityManager em = emf.createEntityManager();
-        Date date = new Date();
-        List<Coin> results = null;
-        try {
-            TypedQuery<Coin> query = em.createNamedQuery("Coin.getAllRows", Coin.class);
-            results = query.getResultList();
-        } catch (Exception e) {
+
+        TypedQuery<Coin> query = em.createQuery("SELECT c from Coin c WHERE c.name = 'Bitcoin'", Coin.class);
+        Coin coin = query.getSingleResult();
+
+        String url = "https://quickchart.io/chart?c=";
+//        String data = "";
+//        String labels = "";
+
+        JsonArray labels = new JsonArray();
+        JsonArray data = new JsonArray();
+        JsonArray datasets = new JsonArray();
+        JsonObject dataset = new JsonObject();
+        for (CoinValue value : coin.getValues()) {
+            data.add(value.getPrice());
+            labels.add(value.getDate().toString());
         }
-        coinsMap = coinFacade.getCoinsMap();
 
-        if (results.size() < 1) {
-            em.getTransaction().begin();
-            coinsMap.forEach((k, coinDTO) -> {
-                Coin coin = new Coin(coinDTO.getName());
-                coins.put(k, coin);
-                coin.addValue(new CoinValue(coinDTO.getPrice(), date));
-                em.persist(coin);
-            });
-            em.getTransaction().commit();
-        } else {
-            System.out.println(coinsMap.size());
-            if (coins.isEmpty()) {
-                getCoins();
-            }
+        dataset.addProperty("label", "Bitcoin");
+        dataset.add("data", data);
+        dataset.addProperty("fill", false);
+        dataset.addProperty("borderColor", "blue");
+        datasets.add(dataset);
 
-            em.getTransaction().begin();
+        JsonObject chart = new JsonObject();
+        JsonObject data1 = new JsonObject();
+        data1.add("labels", labels);
+        data1.add("datasets", datasets);
 
-            coinsMap.forEach((k, coinDTO) -> {
-                Coin coin = coins.get(k);
-                coin.addValue(new CoinValue(coinDTO.getPrice(), date));
-                em.merge(coin);
-            });
-            System.out.println("end");
+        chart.addProperty("type", "line");
+        chart.add("data", data1);
 
-            em.getTransaction().commit();
-        }
-        System.out.println("end");
+        System.out.println(url + chart.toString());
+        return url + chart.toString();
     }
 
-    public void getCoins() {
-        System.out.println(coinsMap);
-        coinsMap.forEach((k, coinDTO) -> {
-            Coin coin = new Coin(coinDTO.getName());
-            coins.put(k, coin);
-        });
-        System.out.println(coins);
-    }
-
-    public String getCoinHistory() {
+    public String getChartData() {
         EntityManager em = emf.createEntityManager();
-        Coin coin1 = em.createQuery("SELECT c from Coin c where c.name = 'Bitcoin'", Coin.class).getSingleResult();
-        Coin coin = coins.get("Bitcoin");
-        List<CoinValue> vals = coin1.getValues();
 
-        JsonObject obj = new JsonObject();
-        for (CoinValue val : vals) {
-            obj.addProperty(val.getDate().toString(), val.getPrice());
+        TypedQuery<Coin> query = em.createQuery("SELECT c from Coin c WHERE c.name = 'Bitcoin'", Coin.class);
+        Coin coin = query.getSingleResult();
+
+        JsonArray labels = new JsonArray();
+        JsonArray data = new JsonArray();
+
+        for (CoinValue value : coin.getValues()) {
+            data.add(value.getPrice());
+            labels.add(value.getDate().toString());
         }
-        return obj.toString();
+
+        JsonObject chart = new JsonObject();
+        chart.add("labels", labels);
+        chart.add("data", data);
+
+        return chart.toString();
     }
 }
