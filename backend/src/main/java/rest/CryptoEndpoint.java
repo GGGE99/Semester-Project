@@ -9,7 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import entities.User;
 import errorhandling.InvalidInputException;
-import facades.DBtimer;
+import facades.HistoryFacade;
 import facades.CoinFacade;
 import java.io.IOException;
 import java.text.ParseException;
@@ -45,7 +45,7 @@ public class CryptoEndpoint {
 
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     private static CoinFacade FACADE;
-    private static DBtimer chart;
+    private static HistoryFacade chart;
 
     @Context
     private UriInfo context;
