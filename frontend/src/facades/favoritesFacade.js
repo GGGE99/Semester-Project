@@ -3,6 +3,7 @@ import { favoritesURL as url } from "../utils/settings";
 
  function favoritesToDB() {
     const postFavorites = (fav) => {
+        console.log(fav)
         const options = makeOptions("POST", true, 
             fav
         )

@@ -96,7 +96,7 @@ public class HistoryFacade {
                 CoinDTO coinDTO = coinsMap.get(k);
                 CoinValue coinValue = new CoinValue(coinDTO.getPrice(), date);
                 coin.addValue(coinValue);
-                em.merge(coin);
+                em.persist(coin);
             });
             em.getTransaction().commit();
         }
