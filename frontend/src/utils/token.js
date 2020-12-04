@@ -23,7 +23,7 @@ export const setToken = (token) => {
 
 export function getUserByJwt() {
   if (getToken()) {
-  console.log(getToken())
+  console.log(parseJwt(getToken()))
     const tokenUser = parseJwt(getToken());
     const tempUser = {
       username: tokenUser.username,
