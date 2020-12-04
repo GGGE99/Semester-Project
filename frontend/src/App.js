@@ -7,6 +7,7 @@ import { getUserByJwt, setToken } from "./utils/token";
 import { loginMethod, logoutMethode } from "./utils/loginUtils";
 import { changePW } from "./utils/changePasswordUtils";
 import Profile from "./components/Profile";
+import {favoriteCoinCurrency} from "./utils/favorites"
 
 function App() {
   const init = { username: "", roles: [] };
@@ -15,12 +16,17 @@ function App() {
   const login = (user, pass) => loginMethod(user, pass, setUser);
   const logout = () => logoutMethode(setUser, init);
   const changePassword = (oldPW, newPW) => changePW(oldPW, newPW);
+  const favorite = (fav) => favoriteCoinCurrency(fav)
 
   useEffect(() => {
     if (getUserByJwt()) {
       setUser(getUserByJwt());
     }
   }, []);
+  
+  useEffect(()=>{
+    console.log(fav)
+  },[fav])
 
   return (
     <>
@@ -38,7 +44,7 @@ function App() {
               <Charts/>
             </Route>
             <Route path="/profile">
-              <Profile fav={fav} setFav={setFav} />
+              <Profile fav={fav} setFav={setFav} favorite={favorite}/>
             </Route>
             <Route path="/settings">
               <Personal changePW={changePassword} user={user} />

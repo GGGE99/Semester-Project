@@ -3,11 +3,11 @@ import { allCoinsURL, allCurrencyURL } from "../utils/settings";
 import { makeOptions, handleHttpErrors } from "../utils/fetchUtils";
 import { Button } from "react-bootstrap";
 
-export default function Profile({ setFav }) {
+export default function Profile({ setFav, fav, favorite }) {
   const [coinArray, setCoinArray] = useState([]);
   const [currencyArray, setCurrencyArray] = useState([]);
-  const [favCoin, setFavCoin] = useState([]);
-  const [favCurrency, setFavCurrency] = useState([]);
+  const [favCoin, setFavCoin] = useState("");
+  const [favCurrency, setFavCurrency] = useState("");
 
   useEffect(() => {
     const options = makeOptions("GET", true);
@@ -27,14 +27,18 @@ export default function Profile({ setFav }) {
 
   function onChangeCoin(evt) {
     setFavCoin(evt.target.value);
+    
   }
 
   function onChangeCurrency(evt) {
     setFavCurrency(evt.target.value);
+    
   }
 
   function onSave() {
     setFav({ favCoin, favCurrency });
+    
+    favorite(fav);
   }
 
   return (

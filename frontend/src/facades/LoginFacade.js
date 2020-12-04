@@ -7,6 +7,7 @@ function apiFacade() {
       username: user,
       password: password,
     });
+    console.log(options)
     return fetch(URL + "/api/login", options).then(handleHttpErrors);
   };
 

@@ -14,3 +14,6 @@ export const passwordURL = "https://marcge.dk/tomcat/SemesterProject/api/info/ch
 
 // export const passwordURL =
 //   "http://localhost:8080/jpareststarter/api/info/changePW";
+
+
+export const favoritesURL = "https://marcge.dk/tomcat/SemesterProject/api/info/favorites"
