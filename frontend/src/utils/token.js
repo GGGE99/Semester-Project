@@ -28,6 +28,8 @@ export function getUserByJwt() {
     const tempUser = {
       username: tokenUser.username,
       roles: [...tokenUser.roles.split(",")],
+      favCoin: tokenUser.favCoin,
+      favCurrency: tokenUser.favCurrency
     };
 
     return tempUser

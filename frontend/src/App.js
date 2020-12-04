@@ -10,7 +10,7 @@ import Profile from "./components/Profile";
 import {favoriteCoinCurrency} from "./utils/favorites"
 
 function App() {
-  const init = { username: "", roles: [] };
+  const init = { username: "", roles: [], favCoin: "", favCurrency: "" };
   const [user, setUser] = useState({ ...init });
   const [fav, setFav] = useState({ favCoin: "", favCurrency: "" });
   const login = (user, pass) => loginMethod(user, pass, setUser);
