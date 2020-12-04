@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 import entities.User;
 import errorhandling.InvalidInputException;
 import facades.ChartFacade;
-import facades.DBtimer;
+import facades.HistoryFacade;
 import facades.CoinFacade;
 import java.io.IOException;
 import java.text.ParseException;
@@ -42,7 +42,7 @@ public class ChartEndpoint {
 
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     private static ChartFacade FACADE = ChartFacade.getChartFacade(EMF);
-    private static DBtimer chart;
+    private static HistoryFacade HISTORY = HistoryFacade.getChartFacade(EMF);
 
     @Context
     private UriInfo context;
@@ -70,12 +70,21 @@ public class ChartEndpoint {
         return FACADE.getChartData();
     }
 
+//    @GET
+//    @Path("start")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public String startHistory() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+//        HistoryFacade.getChartFacade(EMF);
+//
+//        return "{msg: \"history started \"}";
+//    }
+
     @GET
-    @Path("start")
+    @Path("history")
     @Produces(MediaType.APPLICATION_JSON)
-    public String startHistory() throws IOException, InterruptedException, ExecutionException, TimeoutException {
-       DBtimer.getChartFacade(EMF);
-       
-       return "{msg: \"history started \"}";
+    public String makeHistory() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        HISTORY.addCoinsToDb();
+
+        return "{msg: \"history started \"}";
     }
 }
