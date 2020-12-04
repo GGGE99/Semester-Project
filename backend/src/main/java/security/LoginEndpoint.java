@@ -44,7 +44,7 @@ public class LoginEndpoint {
 
     try {
       User user = USER_FACADE.getVeryfiedUser(username, password);
-      String token = createToken(username, user.getRolesAsStrings());
+      String token = createToken(username, user.getRolesAsStrings(), user.getUserInfo().getFavoriteBitcoin(), user.getUserInfo().getFavoriteCurrency());
       JsonObject responseJson = new JsonObject();
       responseJson.addProperty("username", username);
       responseJson.addProperty("token", token);
@@ -59,7 +59,7 @@ public class LoginEndpoint {
     throw new AuthenticationException("Invalid username or password! Please try again");
   }
 
-  private String createToken(String userName, List<String> roles) throws JOSEException {
+  private String createToken(String userName, List<String> roles, String favCoin, String favCurrency) throws JOSEException {
 
     StringBuilder res = new StringBuilder();
     for (String string : roles) {
@@ -67,7 +67,7 @@ public class LoginEndpoint {
       res.append(",");
     }
     String rolesAsString = res.length() > 0 ? res.substring(0, res.length() - 1) : "";
-    String issuer = "semesterstartcode-dat3";
+    String issuer = "Banden";
 
     JWSSigner signer = new MACSigner(SharedSecret.getSharedKey());
     Date date = new Date();
@@ -76,6 +76,8 @@ public class LoginEndpoint {
             .claim("username", userName)
             .claim("roles", rolesAsString)
             .claim("issuer", issuer)
+            .claim("favCoin", favCoin)
+            .claim("favCurrency", favCurrency)
             .issueTime(date)
             .expirationTime(new Date(date.getTime() + TOKEN_EXPIRE_TIME))
             .build();
