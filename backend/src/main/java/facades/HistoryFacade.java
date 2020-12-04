@@ -69,7 +69,7 @@ public class HistoryFacade {
 
         System.out.println(results);
 
-        if (coins.isEmpty()) {
+        if (coins.size() < 1) {
             for (Coin result : results) {
                 coins.put(result.getName(), result);
             }
@@ -89,11 +89,11 @@ public class HistoryFacade {
             em.getTransaction().commit();
         } else {
             System.out.println(date);
-
+            System.out.println(coins.size());
             em.getTransaction().begin();
 
-            coinsMap.forEach((k, coinDTO) -> {
-                Coin coin = coins.get(k);
+            coins.forEach((k, coin) -> {
+                CoinDTO coinDTO = coinsMap.get(k);
                 CoinValue coinValue = new CoinValue(coinDTO.getPrice(), date);
                 coin.addValue(coinValue);
                 em.merge(coin);
