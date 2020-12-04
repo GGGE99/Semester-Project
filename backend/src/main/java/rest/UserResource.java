@@ -170,11 +170,11 @@ public class UserResource {
                 userInfo = new UserInfo();
                 user.setUserInfo(userInfo);
             }
+            System.out.println(userInfoDTO.getFavoriteBitcoin());
                 user.getUserInfo().setFavoriteBitcoin(userInfoDTO.getFavoriteBitcoin());
                 user.getUserInfo().setFavoriteCurrency(userInfoDTO.getFavoriteCurrecny());
               
             em.getTransaction().begin();
-            em.merge(userInfo);
             em.merge(user);
             em.getTransaction().commit();
         } catch (Exception e) {

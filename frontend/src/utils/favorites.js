@@ -4,10 +4,7 @@ export function favoriteCoinCurrency(fav) {
 
     favFacade
         .postFavorites(fav)
-        .then((res) => {
-            res.json()
-
-        })
+        .then(() => {})
         .catch((err) => {
             if (err.status) {
                 err.fullError.then((e) => {
