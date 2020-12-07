@@ -160,6 +160,14 @@ public final class CoinFacade {
         return GSON.toJson(cryptoResults);
 
     }
+    
+    public String GetEveryName(){
+        JsonArray ja = new JsonArray();
+        coinsMap.forEach((name, coin) -> {
+            ja.add(name);
+        });
+        return ja.toString();
+    }
 
     public String GetEveryCoin() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         String URL = "https://api.coinlore.net/api/tickers/";

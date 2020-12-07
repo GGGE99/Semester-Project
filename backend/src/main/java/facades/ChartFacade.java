@@ -8,6 +8,7 @@ package facades;
 import DTOs.CoinDTO;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import entities.Coin;
 import entities.CoinValue;
 import java.io.IOException;
@@ -96,6 +97,30 @@ public class ChartFacade {
         JsonObject chart = new JsonObject();
         chart.add("labels", labels);
         chart.add("data", data);
+
+        return chart.toString();
+    }
+
+    public String getChartByName(String name) {
+        EntityManager em = emf.createEntityManager();
+
+        TypedQuery<Coin> query = em.createQuery("SELECT c from Coin c WHERE c.name = :name", Coin.class);
+        query.setParameter("name", name);
+        Coin coin = query.getSingleResult();
+
+        JsonArray labels = new JsonArray();
+        JsonArray data = new JsonArray();
+        JsonPrimitive jpName = new JsonPrimitive(name);
+
+        for (CoinValue value : coin.getValues()) {
+            data.add(value.getPrice());
+            labels.add(value.getDate().toString());
+        }
+
+        JsonObject chart = new JsonObject();
+        chart.add("labels", labels);
+        chart.add("data", data);
+        chart.add("name", jpName);
 
         return chart.toString();
     }
