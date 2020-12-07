@@ -1,5 +1,5 @@
-//const baseURL = "https://marcge.dk/tomcat/SemesterProject"
-const baseURL = "http://localhost:8080/jpareststarter"
+const baseURL = "https://marcge.dk/tomcat/SemesterProject"
+//const baseURL = "http://localhost:8080/jpareststarter"
 
 
 export const loginURL = baseURL;
