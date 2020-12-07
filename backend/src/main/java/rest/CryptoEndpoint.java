@@ -74,6 +74,13 @@ public class CryptoEndpoint {
     }
 
     @GET
+    @Path("every/name")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String GetEveryName() throws InterruptedException, ExecutionException, TimeoutException, IOException {
+        return FACADE.GetEveryName();
+    }
+
+    @GET
     @Path("all/{Currency}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllWithCurrency(@PathParam("Currency") String currency) throws InterruptedException, ExecutionException, TimeoutException, IOException, ParseException {
@@ -107,5 +114,4 @@ public class CryptoEndpoint {
 //    public String getChart() {
 //        return FACADE.getChart();
 //    }
-
 }

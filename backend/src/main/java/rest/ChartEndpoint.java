@@ -70,6 +70,13 @@ public class ChartEndpoint {
         return FACADE.getChartData();
     }
 
+    @GET
+    @Path("{name}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getChartData(@PathParam("name") String name) {
+        return FACADE.getChartByName(name);
+    }
+
 //    @GET
 //    @Path("start")
 //    @Produces(MediaType.APPLICATION_JSON)
