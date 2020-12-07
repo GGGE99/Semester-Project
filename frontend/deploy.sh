@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 XXXX="sem"
-DROPLET_URL="marcge.dk"
+DROPLET_URL="46.101.211.174"
 
 echo "##############################"
 echo "Building the frontend project"

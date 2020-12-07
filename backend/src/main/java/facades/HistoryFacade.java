@@ -6,6 +6,7 @@
 package facades;
 
 import DTOs.CoinDTO;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import entities.Coin;
 import entities.CoinValue;
@@ -13,7 +14,9 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +36,9 @@ public class HistoryFacade {
     private static HistoryFacade instance;
     private static EntityManagerFactory emf;
     private static CoinFacade coinFacade;
-    private static HashMap<String, Coin> coins = new HashMap();
+//    private static HashMap<String, Coin> coins = new HashMap();
+//    private static HashMap<String, CoinDTO> coinsMap = new HashMap();
+    private static ExecutorService es = Executors.newCachedThreadPool();
 
     public static HistoryFacade getChartFacade(EntityManagerFactory _emf) {
         if (instance == null) {
@@ -57,61 +62,101 @@ public class HistoryFacade {
 
     public void addCoinsToDb() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         EntityManager em = emf.createEntityManager();
+
+        HashMap<String, Coin> coins = new HashMap();
         HashMap<String, CoinDTO> coinsMap = coinFacade.getCoinsMap();
+
         List<Coin> results = null;
         Date date = new Date();
 
         try {
-            TypedQuery<Coin> query = em.createNamedQuery("Coin.getAllRows", Coin.class);
+            TypedQuery<Coin> query = em.createQuery("SELECT c FROM Coin c", Coin.class);
             results = query.getResultList();
         } catch (Exception e) {
+            results = null;
         }
 
-        System.out.println(results);
-
-        if (coins.size() < 1) {
-            for (Coin result : results) {
-                coins.put(result.getName(), result);
-            }
-//            coinsMap.forEach((k, coinDTO) -> {
-//                Coin coin = new Coin(coinDTO.getName());
-//                coins.put(k, coin);
-//            });
-        }
-
-        if (results.isEmpty()) {
-            em.getTransaction().begin();
+        System.out.println(
+                "start");
+        if (results.isEmpty()
+                || results == null) {
+            System.out.println(results.size());
             coinsMap.forEach((k, coinDTO) -> {
                 Coin coin = new Coin(coinDTO.getName());
                 coin.addValue(new CoinValue(coinDTO.getPrice(), date));
+                coins.put(k, coin);
+            });
+
+            em.getTransaction().begin();
+            coins.forEach((k, coin) -> {
+                System.out.println(k);
                 em.persist(coin);
             });
             em.getTransaction().commit();
         } else {
-            System.out.println(date);
-            System.out.println(coins.size());
+            if (coins.isEmpty()) {
+                for (Coin result : results) {
+                    coins.put(result.getName(), result);
+                }
+            }
+            if (coins.isEmpty()) {
+                return;
+            }
             em.getTransaction().begin();
 
             coins.forEach((k, coin) -> {
                 CoinDTO coinDTO = coinsMap.get(k);
-                CoinValue coinValue = new CoinValue(coinDTO.getPrice(), date);
-                coin.addValue(coinValue);
-                em.persist(coin);
+                System.out.println(coinDTO);
+                if (coin != null && coinDTO != null) {
+                    coin.addValue(new CoinValue(coinDTO.getPrice(), date));
+
+                }
+                if (coin != null && coinDTO != null) {
+                    em.merge(coin);
+                }
+
             });
             em.getTransaction().commit();
         }
+
+        System.out.println(
+                "done: " + coins.size());
+
     }
 
-//    public static void getCoins() {
-//        coinsMap.forEach((k, coinDTO) -> {
-//            Coin coin = new Coin(coinDTO.getName());
-//            coins.put(k, coin);
-//        });
-//    }
+    public String getCoins() {
+        EntityManager em = emf.createEntityManager();
+        List<Coin> results = null;
+
+        try {
+            TypedQuery<Coin> query = em.createQuery("SELECT c FROM Coin c", Coin.class
+            );
+            results = query.getResultList();
+        } catch (Exception e) {
+            results = null;
+        }
+        return "" + results.size();
+    }
+
+    public String getCoinvalues() {
+        EntityManager em = emf.createEntityManager();
+        List<CoinValue> results = null;
+
+        try {
+            TypedQuery<CoinValue> query = em.createQuery("SELECT c FROM CoinValue c", CoinValue.class
+            );
+            results = query.getResultList();
+        } catch (Exception e) {
+            results = null;
+        }
+        return "" + results.size();
+    }
+
     public String getCoinHistory() {
         EntityManager em = emf.createEntityManager();
-        Coin coin1 = em.createQuery("SELECT c from Coin c where c.name = 'Bitcoin'", Coin.class).getSingleResult();
-        Coin coin = coins.get("Bitcoin");
+        Coin coin1 = em.createQuery("SELECT c from Coin c where c.name = 'Bitcoin'", Coin.class
+        ).getSingleResult();
+//        Coin coin = coins.get("Bitcoin");
         List<CoinValue> vals = coin1.getValues();
 
         JsonObject obj = new JsonObject();
@@ -121,3 +166,13 @@ public class HistoryFacade {
         return obj.toString();
     }
 }
+
+//class addToDb implements Callable<String> {
+//
+//    
+//
+//    @Override
+//    public String call() throws Exception {
+//
+//    }
+//}

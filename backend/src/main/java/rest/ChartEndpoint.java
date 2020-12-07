@@ -78,7 +78,6 @@ public class ChartEndpoint {
 //
 //        return "{msg: \"history started \"}";
 //    }
-
     @GET
     @Path("history")
     @Produces(MediaType.APPLICATION_JSON)
@@ -86,5 +85,21 @@ public class ChartEndpoint {
         HISTORY.addCoinsToDb();
 
         return "{msg: \"history started \"}";
+    }
+
+    @GET
+    @Path("coins")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getCoins() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+
+        return HISTORY.getCoins();
+    }
+
+    @GET
+    @Path("coinvalues")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getCoinvalues() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+
+        return HISTORY.getCoinvalues();
     }
 }
