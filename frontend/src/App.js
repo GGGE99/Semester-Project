@@ -9,6 +9,7 @@ import { changePW } from "./utils/changePasswordUtils";
 import Profile from "./components/Profile";
 import { favoriteCoinCurrency } from "./utils/favorites";
 
+
 function App() {
   const init = { username: "", roles: [], favCoin: "", favCurrency: "" };
   const [user, setUser] = useState({ ...init });
@@ -27,10 +28,11 @@ function App() {
     console.log("********")
     console.log(fav)
     console.log("********")
-    if (!favCoin === "" || !favCurrency === "") {
-      favoriteCoinCurrency(fav);
+    if (fav.favCoin || fav.favCurrency) {
+      console.log("testtestets")
+      favoriteCoinCurrency(fav, setUser);
     }
-
+    
   }, [fav]);
 
   return (

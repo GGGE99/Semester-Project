@@ -15,3 +15,5 @@ baseURL +"/api/currency/all";
 export const passwordURL = baseURL +"/api/info/changePW";
 
 export const favoritesURL = baseURL + "/api/info/favorites"
+
+export const updateTokenURL = baseURL + "/api/login/token"

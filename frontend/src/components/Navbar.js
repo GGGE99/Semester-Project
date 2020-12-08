@@ -7,7 +7,7 @@ function NavbarShow({ user, logout }) {
   const history = useHistory();
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
-      <Link to="/" className="navbar-brand">
+      <Link to="/"  className="navbar-brand">
         BIT BANDEN <i className="fab fa-typo3" />
       </Link>
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />

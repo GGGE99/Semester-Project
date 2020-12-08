@@ -43,8 +43,9 @@ export default function Profile({ setFav, setUser, user }) {
       }, 5000);
     } else {
       setFav({ favCoin, favCurrency });
-      setUser({ username: user.username, roles: user.roles, 
-                favCoin: favCoin, favCurrency: favCurrency })
+      /* setUser({ username: user.username, roles: user.roles, 
+                favCoin: favCoin, favCurrency: favCurrency }) */
+      
     }
   }
 
