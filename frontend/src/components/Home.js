@@ -123,20 +123,24 @@ export default function AllCoins({ user }) {
       <Col>
         <Currency currency={currency} setCurrency={setCurrency} user={user} />
       </Col>
+
       <Col>
+        <h1>Favorite coin</h1>
         <Table>
           <thead>
             <tr>
               <td>
-                <Button className="btn btn-warning">Name</Button>
+                <h4>Name</h4>
               </td>
               <td>
-                <Button className="btn btn-warning">Price</Button>
+                <h4>Price</h4>
               </td>
               <td>
-                <Button className="btn btn-warning">Volume</Button>
+                <h4>Volume</h4>
               </td>
-              <td>Last Updated</td>
+              <td>
+                <h4>Last Update</h4>
+              </td>
             </tr>
           </thead>
           <tbody>
@@ -156,6 +160,7 @@ export default function AllCoins({ user }) {
         </Table>
       </Col>
       <Col>
+        <h1>All coins</h1>
         <Table>
           <thead>
             <tr>
@@ -168,7 +173,9 @@ export default function AllCoins({ user }) {
               <td onClick={() => sort("volume")}>
                 <Button className="btn btn-warning">Volume</Button>
               </td>
-              <td>Last Updated</td>
+              <td>
+                <h4>Last Update</h4>
+              </td>
             </tr>
           </thead>
           <tbody>
@@ -187,6 +194,7 @@ export default function AllCoins({ user }) {
           </tbody>
         </Table>
       </Col>
+      <Col></Col>
     </Row>
   );
 }
