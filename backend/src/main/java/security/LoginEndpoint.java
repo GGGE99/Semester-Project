@@ -84,7 +84,7 @@ public class LoginEndpoint {
 
     @GET
     @Path("token")
-    @RolesAllowed("user")
+    @RolesAllowed({"user", "admin"})
     @Produces(MediaType.APPLICATION_JSON)
     public Response getNewToken() throws AuthenticationException {
         EntityManager em = EMF.createEntityManager();
