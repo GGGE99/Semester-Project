@@ -80,13 +80,14 @@ public class UserFacade {
         if (name != null) {
             throw new InvalidInputException(String.format("The name %s is already taken", name));
         }
-
+        UserInfoDTO userInfoDTO = new UserInfoDTO("", "");
+        
         User user = new User(userDTO.getName(), userDTO.getPassword());
         for (String role : userDTO.getRoles()) {
             user.addRole(new Role(role));
         }
         user.getUserInfo();
-        
+        user.setUserInfo(new UserInfo().setInfo(userInfoDTO));
         em.getTransaction().begin();
         em.persist(user);
         em.getTransaction().commit();

@@ -24,7 +24,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    favoriteCoinCurrency(fav);
+    console.log("********")
+    console.log(fav)
+    console.log("********")
+    if (!favCoin === "" || !favCurrency === "") {
+      favoriteCoinCurrency(fav);
+    }
+
   }, [fav]);
 
   return (
@@ -34,7 +40,7 @@ function App() {
         <Switch>
           <Container fluid>
             <Route path="/" exact>
-              <Home fav={fav} setFavCoin={setFav} />
+              <Home fav={fav} setFavCoin={setFav} user={user} />
             </Route>
             <Route path="/jokes">
               <Jokes />
@@ -43,7 +49,7 @@ function App() {
               <Charts />
             </Route>
             <Route path="/profile">
-              <Profile setFav={setFav} />
+              <Profile setUser={setUser} user={user} setFav={setFav} />
             </Route>
             <Route path="/settings">
               <Personal changePW={changePassword} user={user} />
