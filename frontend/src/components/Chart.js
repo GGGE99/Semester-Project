@@ -15,6 +15,7 @@ import { Typeahead } from "react-bootstrap-typeahead";
 import "react-bootstrap-typeahead/css/Typeahead.css";
 import { makeOptions, handleHttpErrors } from "../utils/fetchUtils";
 import { baseURL } from "../utils/settings";
+import { MDBTable, MDBTableBody, MDBTableHead } from "mdbreact";
 
 export default function Charts() {
   const [coinNames, setCoinNames] = useState([]);
@@ -30,7 +31,7 @@ export default function Charts() {
       fetch(baseURL + "/api/chart/" + tableCoin.name, options)
         .then(handleHttpErrors)
         .then((data) => {
-          setTableCoinHistory({...data[0]});
+          setTableCoinHistory({ ...data[0] });
         });
     }
   }, [tableCoin]);
@@ -145,11 +146,39 @@ export default function Charts() {
     setChart(newChart);
   }, [charData]);
 
+  const columns = [
+    {
+      label: "Rank",
+      field: "Rank",
+      sort: "asc",
+    },
+    {
+      label: "Name",
+      field: "Name",
+      sort: "asc",
+    },
+    {
+      label: "Price",
+      field: "Price",
+      sort: "asc",
+    },
+    {
+      label: "Currency",
+      field: "Currency",
+      sort: "asc",
+    },
+  ];
+
+  const rows = () => {
+    let data = console.log(data);
+    return data;
+  };
+
   return (
     <Row>
       <Col md={8}>
-        <Row className="w-100" style={{ position: "fixed" }}>
-          <Col md={4}>
+        <Row className="m-0">
+          <Col md={3} className="m-0">
             {multiSelections.map((coin) => {
               return (
                 <Jumbotron className="m-2">
@@ -163,7 +192,7 @@ export default function Charts() {
               );
             })}
           </Col>
-          <Col md={4}>
+          <Col md={9} className="m-0">
             {!coinNames[0] && (
               <div className="text-center m-2">
                 <Spinner animation="border" variant="primary" />
@@ -184,7 +213,6 @@ export default function Charts() {
                 <Spinner animation="grow" variant="dark" />
               </div>
             )}
-
             <Form.Group>
               <Form.Label>Choose your coins</Form.Label>
               <Typeahead
@@ -216,56 +244,52 @@ export default function Charts() {
               }}
             />
             {tableCoinHistory.labels && (
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableCoinHistory.labels.map((label, i) => {
-                    return (
-                      <tr>
-                        <td>{label}</td>
-                        <td>{tableCoinHistory.data[i]}</td>
-                      </tr>
-                    );
+              <MDBTable scrollY maxHeight={window.innerHeight * 0.35}>
+                <MDBTableHead
+                  columns={[
+                    {
+                      label: "Date",
+                      field: "Date",
+                      sort: "asc",
+                    },
+                    {
+                      label: "Price",
+                      field: "Price",
+                      sort: "asc",
+                    },
+                  ]}
+                />
+                <MDBTableBody
+                  rows={tableCoinHistory.labels.map((label, i) => {
+                    return {
+                      Date: label,
+                      Price: tableCoinHistory.data[i],
+                    };
                   })}
-                </tbody>
-              </Table>
+                />
+              </MDBTable>
             )}
           </Col>
         </Row>
       </Col>
       <Col md={4}>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Price</th>
-              <th>Currency</th>
-            </tr>
-          </thead>
-          <tbody>
-            {coinNames.map((coin) => {
-              return (
-                <tr
-                  onClick={() => {
-                    setMultiSelections([...multiSelections, coin]);
-                    setTableCoin({ ...coin });
-                  }}
-                >
-                  <td>{coin.rank}</td>
-                  <td>{coin.name}</td>
-                  <td>{coin.price}</td>
-                  <td>{coin.currency}</td>
-                </tr>
-              );
+        <MDBTable maxHeight={window.innerHeight * 0.95} scrollY>
+          <MDBTableHead columns={columns} />
+          <MDBTableBody
+            rows={coinNames.map((coin) => {
+              return {
+                Rank: coin.rank,
+                Name: coin.name,
+                Price: coin.price,
+                Currency: coin.currency,
+                clickEvent: () => {
+                  setMultiSelections([...multiSelections, coin]);
+                  setTableCoin({ ...coin });
+                },
+              };
             })}
-          </tbody>
-        </Table>
+          />
+        </MDBTable>
       </Col>
     </Row>
   );
