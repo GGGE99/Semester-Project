@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 function NavbarShow({ user, logout }) {
   const history = useHistory();
   return (
-    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" sticky="top">
       <Link to="/"  className="navbar-brand">
         BIT BANDEN <i className="fab fa-typo3" />
       </Link>
