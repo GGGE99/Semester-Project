@@ -5,15 +5,19 @@ import Table from "react-bootstrap/Table";
 import { Button, Col, Row } from "react-bootstrap";
 import Currency from "./Currency";
 
-export default function AllCoins() {
+export default function AllCoins({user}) {
   const [coin, setCoin] = useState([]);
   const [currency, setCurrency] = useState("");
   const [nameBool, setNameBool] = useState(false)
   const [priceBool, setPriceBool] = useState(false)
   const [volumeBool, setVolumeBool] = useState(false)
-
+  
+  console.log("---------------")
+  console.log(user)
+  console.log("---------------")
   useEffect(() => {
     if (currency !== "") {
+      
       const options = makeOptions("GET", true);
       fetch(allCoinsURL + "/" + currency, options)
         .then(handleHttpErrors)
