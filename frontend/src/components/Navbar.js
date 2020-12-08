@@ -28,6 +28,9 @@ function NavbarShow({ user, logout }) {
           ) : (
               <></>
             )}
+        <Link to="/converter" className="nav-link">
+            Converter
+          </Link>
 
           {localStorage.getItem("jwtToken") ? (
             <Link to="/settings" className="nav-link">

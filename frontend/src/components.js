@@ -6,6 +6,7 @@ import currcency from "./components/Currency";
 import personal from "./components/Personal";
 import profile from "./components/Profile";
 import charts from "./components/Chart";
+import converter from "./components/Currency";
 
 
 export const Personal = personal;
@@ -16,4 +17,4 @@ export const Home = home;
 export const Currency = currcency;
 export const Profile = profile;
 export const Charts = charts;
-
+export const Converter = converter;
