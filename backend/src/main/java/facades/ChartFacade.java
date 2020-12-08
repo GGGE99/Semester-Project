@@ -12,7 +12,9 @@ import com.google.gson.JsonPrimitive;
 import entities.Coin;
 import entities.CoinValue;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -98,30 +100,49 @@ public class ChartFacade {
         chart.add("labels", labels);
         chart.add("data", data);
 
-        return chart.toString();
+        JsonArray arr = new JsonArray();
+        arr.add(chart);
+
+        return arr.toString();
     }
 
     public String getChartByName(String name) {
         EntityManager em = emf.createEntityManager();
 
-        TypedQuery<Coin> query = em.createQuery("SELECT c from Coin c WHERE c.name = :name", Coin.class);
-        query.setParameter("name", name);
-        Coin coin = query.getSingleResult();
-
-        JsonArray labels = new JsonArray();
-        JsonArray data = new JsonArray();
-        JsonPrimitive jpName = new JsonPrimitive(name);
-
-        for (CoinValue value : coin.getValues()) {
-            data.add(value.getPrice());
-            labels.add(value.getDate().toString());
+        String[] names = name.split(",");
+        String res = "";
+        for (String name1 : names) {
+            res += "c.name = '" + name1 + "'" + " OR ";
         }
+        res = res.substring(0, res.length() - 3);
+        System.out.println(res);
 
-        JsonObject chart = new JsonObject();
-        chart.add("labels", labels);
-        chart.add("data", data);
-        chart.add("name", jpName);
+        List<Coin> coin = new ArrayList();
+        try {
+            TypedQuery<Coin> query = em.createQuery("SELECT c from Coin c WHERE " + res, Coin.class);
+            coin = query.getResultList();
+        } catch (Exception e) {
+        }
+        JsonArray arr = new JsonArray();
+        for (Coin coin1 : coin) {
+            System.out.println(coin1);
+            JsonArray labels = new JsonArray();
+            JsonArray data = new JsonArray();
+            JsonPrimitive jpName = new JsonPrimitive(coin1.getName());
 
-        return chart.toString();
+            for (CoinValue value : coin1.getValues()) {
+                data.add(value.getPrice());
+                labels.add(value.getDate().toString());
+            }
+
+            JsonObject chart = new JsonObject();
+            chart.add("labels", labels);
+            chart.add("data", data);
+            chart.add("name", jpName);
+
+            arr.add(chart);
+        }
+        System.out.println(arr.toString());
+        return arr.toString();
     }
 }
