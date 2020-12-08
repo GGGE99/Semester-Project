@@ -10,6 +10,7 @@ import Profile from "./components/Profile";
 import { favoriteCoinCurrency } from "./utils/favorites";
 import Converter from "./components/Converter";
 
+
 function App() {
   const init = { username: "", roles: [], favCoin: "", favCurrency: "" };
   const [user, setUser] = useState({ ...init });
@@ -25,7 +26,14 @@ function App() {
   }, []);
 
   useEffect(() => {
-    favoriteCoinCurrency(fav);
+    console.log("********")
+    console.log(fav)
+    console.log("********")
+    if (fav.favCoin || fav.favCurrency) {
+      console.log("testtestets")
+      favoriteCoinCurrency(fav, setUser);
+    }
+    
   }, [fav]);
 
   return (
@@ -35,7 +43,7 @@ function App() {
         <Switch>
           <Container fluid>
             <Route path="/" exact>
-              <Home fav={fav} setFavCoin={setFav} />
+              <Home fav={fav} setFavCoin={setFav} user={user} />
             </Route>
             <Route path="/jokes">
               <Jokes />
@@ -44,7 +52,7 @@ function App() {
               <Charts />
             </Route>
             <Route path="/profile">
-              <Profile setFav={setFav} />
+              <Profile setUser={setUser} user={user} setFav={setFav} />
             </Route>
             <Route path="/settings">
               <Personal changePW={changePassword} user={user} />

@@ -3,11 +3,12 @@ import { allCoinsURL, allCurrencyURL } from "../utils/settings";
 import { makeOptions, handleHttpErrors } from "../utils/fetchUtils";
 import { Button } from "react-bootstrap";
 
-export default function Profile({ setFav }) {
+export default function Profile({ setFav, setUser, user }) {
   const [coinArray, setCoinArray] = useState([]);
   const [currencyArray, setCurrencyArray] = useState([]);
   const [favCoin, setFavCoin] = useState("");
   const [favCurrency, setFavCurrency] = useState("");
+  const [errMSG, setErrMSG] = useState("");
 
   useEffect(() => {
     const options = makeOptions("GET", true);
@@ -30,12 +31,24 @@ export default function Profile({ setFav }) {
   }
 
   function onChangeCurrency(evt) {
-    setFavCurrency(evt.target.value); 
+    setFavCurrency(evt.target.value);
   }
 
   function onSave() {
-    setFav({ favCoin, favCurrency });
+    if (!favCoin || !favCurrency) {
+      setErrMSG("Please choose a favorite coin and default currency")
+      setTimeout(() => {
+        setErrMSG("")
+        return () => { clearTimeout() };
+      }, 5000);
+    } else {
+      setFav({ favCoin, favCurrency });
+      /* setUser({ username: user.username, roles: user.roles, 
+                favCoin: favCoin, favCurrency: favCurrency }) */
+      
+    }
   }
+
 
   return (
     <div>
@@ -44,6 +57,7 @@ export default function Profile({ setFav }) {
       Here change favorite cryptocoin plz: dropdown menu Her
       <div>
         <select name="Coin" onChange={onChangeCoin}>
+          <option value="" selected disabled hidden>Choose coinzzz</option>
           {Object.entries(coinArray).map(([key, value]) => {
             return <option key={key}>{value.name}</option>;
           })}
@@ -53,14 +67,17 @@ export default function Profile({ setFav }) {
       change default currency pls: dropdown menu
       <div>
         <select name="Currency" onChange={onChangeCurrency}>
+          <option value="" selected disabled hidden>Choose currencyzzz</option>
           {Object.entries(currencyArray).map(([key, value]) => {
             return <option key={key}>{key}</option>;
           })}
         </select>
       </div>
       <hr />
-      Save button here pløøz
-      <Button onClick={onSave}> Save </Button>
+      Save button here pløøz<div>
+        <Button onClick={onSave}> Save </Button>
+      </div>
+      <div><p className="text-danger">{errMSG}</p></div>
     </div>
   );
 }
