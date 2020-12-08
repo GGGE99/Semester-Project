@@ -60,68 +60,9 @@ public class HistoryFacade {
         return instance;
     }
 
-    public void addCoinsToDb() throws IOException, InterruptedException, ExecutionException, TimeoutException {
-        EntityManager em = emf.createEntityManager();
-
-        HashMap<String, Coin> coins = new HashMap();
-        HashMap<String, CoinDTO> coinsMap = coinFacade.getCoinsMap();
-
-        List<Coin> results = null;
-        Date date = new Date();
-
-        try {
-            TypedQuery<Coin> query = em.createQuery("SELECT c FROM Coin c", Coin.class);
-            results = query.getResultList();
-        } catch (Exception e) {
-            results = null;
-        }
-
-        System.out.println(
-                "start");
-        if (results.isEmpty()
-                || results == null) {
-            System.out.println(results.size());
-            coinsMap.forEach((k, coinDTO) -> {
-                Coin coin = new Coin(coinDTO.getName());
-                coin.addValue(new CoinValue(coinDTO.getPrice(), date));
-                coins.put(k, coin);
-            });
-
-            em.getTransaction().begin();
-            coins.forEach((k, coin) -> {
-                System.out.println(k);
-                em.persist(coin);
-            });
-            em.getTransaction().commit();
-        } else {
-            if (coins.isEmpty()) {
-                for (Coin result : results) {
-                    coins.put(result.getName(), result);
-                }
-            }
-            if (coins.isEmpty()) {
-                return;
-            }
-            em.getTransaction().begin();
-
-            coins.forEach((k, coin) -> {
-                CoinDTO coinDTO = coinsMap.get(k);
-                System.out.println(coinDTO);
-                if (coin != null && coinDTO != null) {
-                    coin.addValue(new CoinValue(coinDTO.getPrice(), date));
-
-                }
-                if (coin != null && coinDTO != null) {
-                    em.merge(coin);
-                }
-
-            });
-            em.getTransaction().commit();
-        }
-
-        System.out.println(
-                "done: " + coins.size());
-
+    public String addCoinsToDb() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        es.submit(new addToDb(emf));
+        return "Added";
     }
 
     public String getCoins() {
@@ -167,12 +108,78 @@ public class HistoryFacade {
     }
 }
 
-//class addToDb implements Callable<String> {
-//
-//    
-//
-//    @Override
-//    public String call() throws Exception {
-//
-//    }
-//}
+class addToDb implements Callable<String> {
+
+    private static EntityManager em;
+    private static HashMap<String, CoinDTO> coinsMap;
+    private static CoinFacade coinFacade;
+
+    public addToDb(EntityManagerFactory emf) throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        coinFacade = CoinFacade.getCoinFacade(emf);
+        this.em = emf.createEntityManager();
+        coinsMap = coinFacade.getCoinsMap();
+    }
+
+    @Override
+    public String call() throws Exception {
+
+        HashMap<String, Coin> coins = new HashMap();
+        
+
+        List<Coin> results = null;
+        Date date = new Date();
+
+        try {
+            TypedQuery<Coin> query = em.createQuery("SELECT c FROM Coin c", Coin.class);
+            results = query.getResultList();
+        } catch (Exception e) {
+            results = null;
+        }
+
+        System.out.println(
+                "start");
+        if (results.isEmpty()
+                || results == null) {
+            coinsMap.forEach((k, coinDTO) -> {
+                Coin coin = new Coin(coinDTO.getName());
+                coin.addValue(new CoinValue(coinDTO.getPrice(), date));
+                coins.put(k, coin);
+            });
+
+            em.getTransaction().begin();
+            coins.forEach((k, coin) -> {
+                System.out.println(k);
+                em.persist(coin);
+            });
+            em.getTransaction().commit();
+        } else {
+            if (coins.isEmpty()) {
+                for (Coin result : results) {
+                    coins.put(result.getName(), result);
+                }
+            }
+            if (coins.isEmpty()) {
+                return "";
+            }
+            em.getTransaction().begin();
+
+            coins.forEach((k, coin) -> {
+                CoinDTO coinDTO = coinsMap.get(k);
+                if (coin != null && coinDTO != null) {
+                    coin.addValue(new CoinValue(coinDTO.getPrice(), date));
+
+                }
+                if (coin != null && coinDTO != null) {
+                    em.merge(coin);
+                }
+
+            });
+            em.getTransaction().commit();
+            System.out.println("done");
+            return "done";
+        }
+
+        System.out.println("done: " + coins.size());
+        return "";
+    }
+}

@@ -89,9 +89,9 @@ public class ChartEndpoint {
     @Path("history")
     @Produces(MediaType.APPLICATION_JSON)
     public String makeHistory() throws IOException, InterruptedException, ExecutionException, TimeoutException {
-        HISTORY.addCoinsToDb();
+        
 
-        return "{msg: \"history started \"}";
+        return HISTORY.addCoinsToDb();
     }
 
     @GET
