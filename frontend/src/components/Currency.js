@@ -2,7 +2,7 @@ import { allCurrencyURL } from "../utils/settings";
 import React, { useState, useEffect } from "react";
 import { makeOptions, handleHttpErrors } from "../utils/fetchUtils";
 
-export default function AllCurrency({ setCurrency }) {
+export default function AllCurrency({ setCurrency, user }) {
   const [currencyArray, setCurrencyArray] = useState([]);
   useEffect(() => {
     const options = makeOptions("GET", true);
@@ -21,6 +21,9 @@ export default function AllCurrency({ setCurrency }) {
   return (
     <div>
       <select name="Currency" onChange={onChange}>
+        <option value={user.favCurrency} selected>
+          {user.favCurrency} - Your default
+        </option>
         {Object.entries(currencyArray).map(([key, value]) => {
           return <option key={key}>{key}</option>;
         })}

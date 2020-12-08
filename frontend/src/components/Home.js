@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { allCoinsURL } from "../utils/settings";
+import { allCoinsURL, baseURL } from "../utils/settings";
 import { makeOptions, handleHttpErrors } from "../utils/fetchUtils";
 import Table from "react-bootstrap/Table";
 import { Button, Col, Row } from "react-bootstrap";
 import Currency from "./Currency";
 
-export default function AllCoins({user}) {
+export default function AllCoins({ user }) {
   const [coin, setCoin] = useState([]);
+  const [fCoin, setFCoin] = useState([{}]);
   const [currency, setCurrency] = useState("");
-  const [nameBool, setNameBool] = useState(false)
-  const [priceBool, setPriceBool] = useState(false)
-  const [volumeBool, setVolumeBool] = useState(false)
-  
-  console.log("---------------")
-  console.log(user)
-  console.log("---------------")
+  const [nameBool, setNameBool] = useState(false);
+  const [priceBool, setPriceBool] = useState(false);
+  const [volumeBool, setVolumeBool] = useState(false);
+
+  console.log("---------------");
+  console.log(user);
+  console.log("---------------");
   useEffect(() => {
-    if (currency !== "") {
-      
+    if (user.favCurrency !== "" && currency === "") {
+      setCurrency(user.favCurrency);
+      const options = makeOptions("GET", true);
+      fetch(allCoinsURL + "/" + user.favCurrency, options)
+        .then(handleHttpErrors)
+        .then((data) => {
+          console.log(data);
+          setCoin([...data]);
+        });
+    } else {
       const options = makeOptions("GET", true);
       fetch(allCoinsURL + "/" + currency, options)
         .then(handleHttpErrors)
@@ -26,7 +35,24 @@ export default function AllCoins({user}) {
           setCoin([...data]);
         });
     }
-  }, [currency]);
+  }, [currency] || []);
+
+  useEffect(() => {
+    if (user.favCoin !== "") {
+      const options = makeOptions("GET", true);
+      fetch(
+        baseURL + "/api/crypto/" + user.favCoin + "/" + user.favCurrency,
+        options
+      )
+        .then(handleHttpErrors)
+        .then((data) => {
+          console.log(data + "metoden vi arbejder på");
+          setFCoin([{ ...data }]);
+        });
+    } else {
+      console.log("Favcoin er tom");
+    }
+  }, [currency] || []);
 
   useEffect(() => {
     const options = makeOptions("GET", true);
@@ -50,47 +76,84 @@ export default function AllCoins({user}) {
   }
   function sort(sortValue) {
     if (sortValue === "price" && !priceBool) {
-      setPriceBool(true)
-      setVolumeBool(false)
-      setNameBool(false)
+      setPriceBool(true);
+      setVolumeBool(false);
+      setNameBool(false);
       setCoin([...coin.sort((a, b) => compare(a.price, b.price))]);
-    }
-    else if (sortValue === "price" && priceBool) {
-      setPriceBool(false)
-      setVolumeBool(false)
-      setNameBool(false)
-      setCoin([...coin.sort((a, b) => compareReverse(a.price, b.price))])
+    } else if (sortValue === "price" && priceBool) {
+      setPriceBool(false);
+      setVolumeBool(false);
+      setNameBool(false);
+      setCoin([...coin.sort((a, b) => compareReverse(a.price, b.price))]);
     }
     if (sortValue === "volume" && !volumeBool) {
-      setPriceBool(false)
-      setVolumeBool(true)
-      setNameBool(false)
+      setPriceBool(false);
+      setVolumeBool(true);
+      setNameBool(false);
       setCoin([...coin.sort((a, b) => compare(a.volume, b.volume))]);
-    }
-    else if (sortValue === "volume" && volumeBool) {
-      setPriceBool(false)
-      setVolumeBool(false)
-      setNameBool(false)
+    } else if (sortValue === "volume" && volumeBool) {
+      setPriceBool(false);
+      setVolumeBool(false);
+      setNameBool(false);
       setCoin([...coin.sort((a, b) => compareReverse(a.volume, b.volume))]);
     }
     if (sortValue === "name" && !nameBool) {
-      setPriceBool(false)
-      setVolumeBool(false)
-      setNameBool(true)
-      setCoin([...coin.sort((a, b) => compare(b.name.toLowerCase(), a.name.toLowerCase())),]);
-    }
-    else if (sortValue === "name" && nameBool) {
-      setPriceBool(false)
-      setVolumeBool(false)
-      setNameBool(false)
-      setCoin([...coin.sort((a, b) => compare(a.name.toLowerCase(), b.name.toLowerCase())),]);
+      setPriceBool(false);
+      setVolumeBool(false);
+      setNameBool(true);
+      setCoin([
+        ...coin.sort((a, b) =>
+          compare(b.name.toLowerCase(), a.name.toLowerCase())
+        ),
+      ]);
+    } else if (sortValue === "name" && nameBool) {
+      setPriceBool(false);
+      setVolumeBool(false);
+      setNameBool(false);
+      setCoin([
+        ...coin.sort((a, b) =>
+          compare(a.name.toLowerCase(), b.name.toLowerCase())
+        ),
+      ]);
     }
   }
 
   return (
     <Row>
       <Col>
-        <Currency currency={currency} setCurrency={setCurrency} />
+        <Currency currency={currency} setCurrency={setCurrency} user={user} />
+      </Col>
+      <Col>
+        <Table>
+          <thead>
+            <tr>
+              <td>
+                <Button className="btn btn-warning">Name</Button>
+              </td>
+              <td>
+                <Button className="btn btn-warning">Price</Button>
+              </td>
+              <td>
+                <Button className="btn btn-warning">Volume</Button>
+              </td>
+              <td>Last Updated</td>
+            </tr>
+          </thead>
+          <tbody>
+            {fCoin.map((p) => {
+              return (
+                <tr key={p.name}>
+                  <td>{p.name}</td>
+                  <td>
+                    {p.price} {currency}
+                  </td>
+                  <td>{p.volume}</td>
+                  <td>{p.lastUpdated}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
       </Col>
       <Col>
         <Table>
@@ -124,7 +187,6 @@ export default function AllCoins({user}) {
           </tbody>
         </Table>
       </Col>
-      <Col></Col>
     </Row>
   );
 }
