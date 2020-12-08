@@ -8,6 +8,7 @@ import { loginMethod, logoutMethode } from "./utils/loginUtils";
 import { changePW } from "./utils/changePasswordUtils";
 import Profile from "./components/Profile";
 import { favoriteCoinCurrency } from "./utils/favorites";
+import Converter from "./components/Converter";
 
 function App() {
   const init = { username: "", roles: [], favCoin: "", favCurrency: "" };
@@ -54,6 +55,9 @@ function App() {
             </Route>
             <Route path="/signup">
               <Signup />
+            </Route>
+            <Route path="/converter">
+              <Converter  />
             </Route>
           </Container>
         </Switch>
