@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { allCoinsURL, baseURL } from "../utils/settings";
+import {getUserByJwt} from "../utils/token";
 import { makeOptions, handleHttpErrors } from "../utils/fetchUtils";
 import Table from "react-bootstrap/Table";
 import { Button, Col, Row } from "react-bootstrap";
 import Currency from "./Currency";
 
-export default function AllCoins({ user }) {
+export default function AllCoins({ user, setUser }) {
   const [coin, setCoin] = useState([]);
   const [fCoin, setFCoin] = useState([]);
   const [currency, setCurrency] = useState("");
@@ -35,10 +36,11 @@ export default function AllCoins({ user }) {
       }
 
       // useeffect til favorite coin table
-      if (user.favCoin && user.favCurrency && currency === "") {
+      const tokenUser = {...getUserByJwt()}
+      if (tokenUser.favCoin !== "" && tokenUser.favCurrency !== "" && currency === "") {
         const options = makeOptions("GET", true);
         fetch(
-          baseURL + "/api/crypto/" + user.favCoin + "/" + user.favCurrency,
+          baseURL + "/api/crypto/" + tokenUser.favCoin + "/" + tokenUser.favCurrency,
           options
         )
           .then(handleHttpErrors)
@@ -46,9 +48,9 @@ export default function AllCoins({ user }) {
             console.log(data);
             setFCoin([{ ...data }]);
           });
-      } else if (user.favCoin && user.favCurrency) {
+      } else if (tokenUser.favCoin !== "" && tokenUser.favCurrency !== "") {
         const options = makeOptions("GET", true);
-        fetch(baseURL + "/api/crypto/" + user.favCoin + "/" + currency, options)
+        fetch(baseURL + "/api/crypto/" + tokenUser.favCoin + "/" + currency, options)
           .then(handleHttpErrors)
           .then((data) => {
             console.log(data);
@@ -56,8 +58,7 @@ export default function AllCoins({ user }) {
           });
       }
     },
-    [currency],
-    []
+    [currency]
   );
 
   function compare(a, b) {

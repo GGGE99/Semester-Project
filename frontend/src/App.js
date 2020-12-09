@@ -45,7 +45,7 @@ function App() {
         <Switch>
           <Container fluid>
             <Route path="/" exact>
-              <Home fav={fav} setFavCoin={setFav} user={user} />
+              <Home setUser={setUser} setFavCoin={setFav} user={user} />
             </Route>
             <Route path="/jokes">
               <Jokes />
