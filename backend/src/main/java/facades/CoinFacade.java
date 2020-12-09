@@ -105,11 +105,13 @@ public final class CoinFacade {
 
     public String GetACoinWithCurrency(String name, String currency) throws IOException, InterruptedException, ExecutionException, TimeoutException, ParseException, InvalidInputException {
         try {
-            CoinDTO coin = coinsMap.get(name);
+            HashMap<String, CoinDTO> coinsMap2 = getCoinsMap();
+            CoinDTO coin = coinsMap2.get(name);
             double cur = Double.parseDouble(currencies.get(currency));
             coin.setPrice(cur * coin.getPrice());
             coin.setCurrency(currency);
-            return GSON.toJson(coin);
+            
+            return GSON.toJson(coin);       
         } catch (Exception e) {
             throw new InvalidInputException(String.format("dadaasdasdasd", "sdasda"));
         }

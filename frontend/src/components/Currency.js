@@ -21,7 +21,7 @@ export default function AllCurrency({ setCurrency, user }) {
   return (
     <div>
       <select name="Currency" onChange={onChange}>
-        <option value={user.favCurrency} selected>
+        <option value="" selected>
           {user.favCurrency} - Your default
         </option>
         {Object.entries(currencyArray).map(([key, value]) => {

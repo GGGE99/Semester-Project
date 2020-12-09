@@ -7,17 +7,15 @@ import Currency from "./Currency";
 
 export default function AllCoins({ user }) {
   const [coin, setCoin] = useState([]);
-  const [fCoin, setFCoin] = useState([{}]);
+  const [fCoin, setFCoin] = useState([]);
   const [currency, setCurrency] = useState("");
   const [nameBool, setNameBool] = useState(false);
   const [priceBool, setPriceBool] = useState(false);
   const [volumeBool, setVolumeBool] = useState(false);
 
-  console.log("---------------");
-  console.log(user);
-  console.log("---------------");
+
   useEffect(() => {
-    if (user.favCurrency !== "" && currency === "") {
+    if (currency === "") {
       setCurrency(user.favCurrency);
       const options = makeOptions("GET", true);
       fetch(allCoinsURL + "/" + user.favCurrency, options)
@@ -35,10 +33,11 @@ export default function AllCoins({ user }) {
           setCoin([...data]);
         });
     }
-  }, [currency] || []);
+  }, [currency, ], []);
 
+  // useeffect til favorite coin table
   useEffect(() => {
-    if (user.favCoin !== "") {
+    if (currency === "") {
       const options = makeOptions("GET", true);
       fetch(
         baseURL + "/api/crypto/" + user.favCoin + "/" + user.favCurrency,
@@ -46,15 +45,24 @@ export default function AllCoins({ user }) {
       )
         .then(handleHttpErrors)
         .then((data) => {
-          console.log(data + "metoden vi arbejder på");
+          console.log(data);
           setFCoin([{ ...data }]);
         });
     } else {
-      console.log("Favcoin er tom");
+      const options = makeOptions("GET", true);
+      fetch(
+        baseURL + "/api/crypto/" + user.favCoin + "/" + currency,
+        options
+      )
+        .then(handleHttpErrors)
+        .then((data) => {
+          console.log(data);
+          setFCoin([{ ...data }]);
+        });
     }
-  }, [currency] || []);
+  }, [currency]);
 
-  useEffect(() => {
+/*   useEffect(() => {
     const options = makeOptions("GET", true);
     fetch(allCoinsURL, options)
       .then(handleHttpErrors)
@@ -62,7 +70,7 @@ export default function AllCoins({ user }) {
         console.log(data);
         setCoin([...data]);
       });
-  }, []);
+  }, []); */
 
   function compare(a, b) {
     if (a < b) return 1;
