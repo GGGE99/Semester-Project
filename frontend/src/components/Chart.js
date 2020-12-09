@@ -5,10 +5,7 @@ import {
   Form,
   Button,
   Jumbotron,
-  Table,
   Spinner,
-  Nav,
-  Navbar,
 } from "react-bootstrap";
 import React, { useState, useEffect } from "react";
 import { Typeahead } from "react-bootstrap-typeahead";
