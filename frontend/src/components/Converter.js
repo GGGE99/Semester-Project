@@ -42,10 +42,6 @@ export default function Convert() {
 
   const convert = () => {
     const convertedResult = coin * currency * amount;
-    console.log(coin)
-    console.log(currency)
-    console.log(amount)
-
     setResult(convertedResult);
   };
 
