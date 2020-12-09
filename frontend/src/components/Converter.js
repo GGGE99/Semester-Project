@@ -42,14 +42,18 @@ export default function Convert() {
 
   const convert = () => {
     const convertedResult = coin * currency * amount;
+    console.log(coin)
+    console.log(currency)
+    console.log(amount)
+
     setResult(convertedResult);
   };
 
   return (
     <Row>
-      <Col></Col>
-      <Col>
-        <Jumbotron className="text-center">
+      <Col md={2}></Col>
+      <Col md={8}>
+        <Jumbotron className="text-center mt-1">
           <Row>
             <Col md={10} className="m-0">
               <Form.Control as="select" custom onChange={onChangeCoin}>
@@ -63,7 +67,7 @@ export default function Convert() {
               </Form.Control>
             </Col>
             <Col md={2} className="m-0">
-              <Form.Control as="select" custom onChange={onChangeCoin}>
+              <Form.Control as="select" custom onChange={onChangeCurrency}>
                 {Object.entries(currencyArray).map(([key, value]) => {
                   return (
                     <option value={value} key={key}>
@@ -76,8 +80,8 @@ export default function Convert() {
           </Row>
           <br />
           <Form.Control
-            type="text"
-            placeholder="Password"
+            type="number"
+            placeholder="Amount"
             onChange={onChangeAmount}
           />
           <br />
@@ -93,7 +97,7 @@ export default function Convert() {
           />
         </Jumbotron>
       </Col>
-      <Col></Col>
+      <Col md={2}></Col>
     </Row>
   );
 }
