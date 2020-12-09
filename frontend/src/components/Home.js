@@ -56,7 +56,8 @@ export default function AllCoins({ user }) {
           });
       }
     },
-    [currency], []
+    [currency],
+    []
   );
 
   function compare(a, b) {
@@ -118,42 +119,46 @@ export default function AllCoins({ user }) {
       <Col>
         <Currency currency={currency} setCurrency={setCurrency} user={user} />
       </Col>
+      {user.favCurrency !== "" && user.favCoin !== "" ? (
+        <Col>
+          <h1>Favorite coin</h1>
+          <Table>
+            <thead>
+              <tr>
+                <td>
+                  <h4>Name</h4>
+                </td>
+                <td>
+                  <h4>Price</h4>
+                </td>
+                <td>
+                  <h4>Volume</h4>
+                </td>
+                <td>
+                  <h4>Last Update</h4>
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              {fCoin.map((p) => {
+                return (
+                  <tr key={p.name}>
+                    <td>{p.name}</td>
+                    <td>
+                      {p.price} {currency}
+                    </td>
+                    <td>{p.volume}</td>
+                    <td>{p.lastUpdated}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </Col>
+      ) : (
+        <></>
+      )}
 
-      <Col>
-        <h1>Favorite coin</h1>
-        <Table>
-          <thead>
-            <tr>
-              <td>
-                <h4>Name</h4>
-              </td>
-              <td>
-                <h4>Price</h4>
-              </td>
-              <td>
-                <h4>Volume</h4>
-              </td>
-              <td>
-                <h4>Last Update</h4>
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            {fCoin.map((p) => {
-              return (
-                <tr key={p.name}>
-                  <td>{p.name}</td>
-                  <td>
-                    {p.price} {currency}
-                  </td>
-                  <td>{p.volume}</td>
-                  <td>{p.lastUpdated}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </Col>
       <Col>
         <h1>All coins</h1>
         <Table>
