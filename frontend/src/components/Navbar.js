@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 
 function NavbarShow({ user, logout }) {
   const history = useHistory();
+
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" sticky="top">
       <Link to="/" className="navbar-brand">
@@ -13,10 +14,6 @@ function NavbarShow({ user, logout }) {
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse id="responsive-navbar-nav">
         <Nav className="mr-auto">
-          <Link to="/jokes" className="nav-link">
-            Jokes
-          </Link>
-
           <Link to="/charts" className="nav-link">
             Charts
           </Link>

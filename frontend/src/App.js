@@ -15,8 +15,10 @@ function App() {
   const init = { username: "", roles: [], favCoin: "", favCurrency: "" };
   const [user, setUser] = useState({ ...init });
   const [fav, setFav] = useState({ favCoin: "", favCurrency: "" });
-  const login = (user, pass) => loginMethod(user, pass, setUser);
-  const logout = () => logoutMethode(setUser, init);
+  const logout = () => {
+    setUser({ ...init });
+    localStorage.removeItem("jwtToken");
+  };
   const changePassword = (oldPW, newPW) => changePW(oldPW, newPW);
 
   useEffect(() => {
@@ -59,7 +61,7 @@ function App() {
             </Route>
             <Route path="/products" />
             <Route path="/signin">
-              <Login login={login} user={user} logout={logout} />
+              <Login setUser={setUser} user={user} logout={logout} />
             </Route>
             <Route path="/signup">
               <Signup />
