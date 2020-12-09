@@ -7,8 +7,8 @@ function NavbarShow({ user, logout }) {
   const history = useHistory();
 
   return (
-    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" sticky="top">
-      <Link to="/" className="navbar-brand">
+    <Navbar collapseOnSelect expand="lg"  variant="dark" sticky="top" style={{backgroundColor: "#1919E8"}}>
+      <Link to="/" className="navbar-brand" style={{color: "#FF8725"}}>
         BIT BANDEN <i className="fab fa-typo3" />
       </Link>
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />

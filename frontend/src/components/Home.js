@@ -13,64 +13,51 @@ export default function AllCoins({ user }) {
   const [priceBool, setPriceBool] = useState(false);
   const [volumeBool, setVolumeBool] = useState(false);
 
+  useEffect(
+    () => {
+      if (currency === "") {
+        setCurrency(user.favCurrency);
+        const options = makeOptions("GET", true);
+        fetch(allCoinsURL + "/" + user.favCurrency, options)
+          .then(handleHttpErrors)
+          .then((data) => {
+            console.log(data);
+            setCoin([...data]);
+          });
+      } else {
+        const options = makeOptions("GET", true);
+        fetch(allCoinsURL + "/" + currency, options)
+          .then(handleHttpErrors)
+          .then((data) => {
+            console.log(data);
+            setCoin([...data]);
+          });
+      }
 
-  useEffect(() => {
-    if (currency === "") {
-      setCurrency(user.favCurrency);
-      const options = makeOptions("GET", true);
-      fetch(allCoinsURL + "/" + user.favCurrency, options)
-        .then(handleHttpErrors)
-        .then((data) => {
-          console.log(data);
-          setCoin([...data]);
-        });
-    } else {
-      const options = makeOptions("GET", true);
-      fetch(allCoinsURL + "/" + currency, options)
-        .then(handleHttpErrors)
-        .then((data) => {
-          console.log(data);
-          setCoin([...data]);
-        });
-    }
-  }, [currency, ], []);
-
-  // useeffect til favorite coin table
-  useEffect(() => {
-    if (currency === "") {
-      const options = makeOptions("GET", true);
-      fetch(
-        baseURL + "/api/crypto/" + user.favCoin + "/" + user.favCurrency,
-        options
-      )
-        .then(handleHttpErrors)
-        .then((data) => {
-          console.log(data);
-          setFCoin([{ ...data }]);
-        });
-    } else {
-      const options = makeOptions("GET", true);
-      fetch(
-        baseURL + "/api/crypto/" + user.favCoin + "/" + currency,
-        options
-      )
-        .then(handleHttpErrors)
-        .then((data) => {
-          console.log(data);
-          setFCoin([{ ...data }]);
-        });
-    }
-  }, [currency]);
-
-/*   useEffect(() => {
-    const options = makeOptions("GET", true);
-    fetch(allCoinsURL, options)
-      .then(handleHttpErrors)
-      .then((data) => {
-        console.log(data);
-        setCoin([...data]);
-      });
-  }, []); */
+      // useeffect til favorite coin table
+      if (user.favCoin && user.favCurrency && currency === "") {
+        const options = makeOptions("GET", true);
+        fetch(
+          baseURL + "/api/crypto/" + user.favCoin + "/" + user.favCurrency,
+          options
+        )
+          .then(handleHttpErrors)
+          .then((data) => {
+            console.log(data);
+            setFCoin([{ ...data }]);
+          });
+      } else if (user.favCoin && user.favCurrency) {
+        const options = makeOptions("GET", true);
+        fetch(baseURL + "/api/crypto/" + user.favCoin + "/" + currency, options)
+          .then(handleHttpErrors)
+          .then((data) => {
+            console.log(data);
+            setFCoin([{ ...data }]);
+          });
+      }
+    },
+    [currency], []
+  );
 
   function compare(a, b) {
     if (a < b) return 1;
