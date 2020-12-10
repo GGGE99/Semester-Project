@@ -57,13 +57,6 @@ public class ChartEndpoint {
     }
 
     @GET
-    @Path("chart")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getChart() {
-        return FACADE.getChart();
-    }
-
-    @GET
     @Path("data")
     @Produces(MediaType.APPLICATION_JSON)
     public String getChartData() {
