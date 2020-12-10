@@ -19,11 +19,17 @@ export default function AllCurrency({ setCurrency, user }) {
   }
 
   return (
-    <div>
+    <div className="mt-2">
       <select name="Currency" onChange={onChange}>
-        <option value="" selected>
-          {user.favCurrency} - Your default
-        </option>
+      {user.favCurrency !== "" ? (
+          <option value="" selected>
+            {user.favCurrency} - Your default
+          </option>
+        ) : (
+          <option value="" selected>
+            Choose currency
+          </option>
+        )}
         {Object.entries(currencyArray).map(([key, value]) => {
           return <option key={key}>{key}</option>;
         })}

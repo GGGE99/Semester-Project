@@ -51,7 +51,7 @@ export default function Convert() {
       <Col md={8}>
         <Jumbotron className="text-center mt-1">
           <Row>
-            <Col md={10} className="m-0">
+            <Col md={8} className="m-0">
               <Form.Control as="select" custom onChange={onChangeCoin}>
                 {coinArray.map((value) => {
                   return (
@@ -62,7 +62,7 @@ export default function Convert() {
                 })}
               </Form.Control>
             </Col>
-            <Col md={2} className="m-0">
+            <Col md={4} className="m-0">
               <Form.Control as="select" custom onChange={onChangeCurrency}>
                 {Object.entries(currencyArray).map(([key, value]) => {
                   return (

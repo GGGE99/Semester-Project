@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { allCoinsURL, baseURL } from "../utils/settings";
+import {getUserByJwt} from "../utils/token";
 import { makeOptions, handleHttpErrors } from "../utils/fetchUtils";
 import Table from "react-bootstrap/Table";
 import { Button, Col, Row } from "react-bootstrap";
 import Currency from "./Currency";
 
-export default function AllCoins({ user }) {
+export default function AllCoins({ user, setUser }) {
   const [coin, setCoin] = useState([]);
   const [fCoin, setFCoin] = useState([]);
   const [currency, setCurrency] = useState("");
@@ -13,64 +14,52 @@ export default function AllCoins({ user }) {
   const [priceBool, setPriceBool] = useState(false);
   const [volumeBool, setVolumeBool] = useState(false);
 
+  useEffect(
+    () => {
+      if (currency === "") {
+        setCurrency(user.favCurrency);
+        const options = makeOptions("GET", true);
+        fetch(allCoinsURL + "/" + user.favCurrency, options)
+          .then(handleHttpErrors)
+          .then((data) => {
+            console.log(data);
+            setCoin([...data]);
+          });
+      } else {
+        const options = makeOptions("GET", true);
+        fetch(allCoinsURL + "/" + currency, options)
+          .then(handleHttpErrors)
+          .then((data) => {
+            console.log(data);
+            setCoin([...data]);
+          });
+      }
 
-  useEffect(() => {
-    if (currency === "") {
-      setCurrency(user.favCurrency);
-      const options = makeOptions("GET", true);
-      fetch(allCoinsURL + "/" + user.favCurrency, options)
-        .then(handleHttpErrors)
-        .then((data) => {
-          console.log(data);
-          setCoin([...data]);
-        });
-    } else {
-      const options = makeOptions("GET", true);
-      fetch(allCoinsURL + "/" + currency, options)
-        .then(handleHttpErrors)
-        .then((data) => {
-          console.log(data);
-          setCoin([...data]);
-        });
-    }
-  }, [currency, ], []);
-
-  // useeffect til favorite coin table
-  useEffect(() => {
-    if (currency === "") {
-      const options = makeOptions("GET", true);
-      fetch(
-        baseURL + "/api/crypto/" + user.favCoin + "/" + user.favCurrency,
-        options
-      )
-        .then(handleHttpErrors)
-        .then((data) => {
-          console.log(data);
-          setFCoin([{ ...data }]);
-        });
-    } else {
-      const options = makeOptions("GET", true);
-      fetch(
-        baseURL + "/api/crypto/" + user.favCoin + "/" + currency,
-        options
-      )
-        .then(handleHttpErrors)
-        .then((data) => {
-          console.log(data);
-          setFCoin([{ ...data }]);
-        });
-    }
-  }, [currency]);
-
-/*   useEffect(() => {
-    const options = makeOptions("GET", true);
-    fetch(allCoinsURL, options)
-      .then(handleHttpErrors)
-      .then((data) => {
-        console.log(data);
-        setCoin([...data]);
-      });
-  }, []); */
+      // useeffect til favorite coin table
+      const tokenUser = {...getUserByJwt()}
+      if (tokenUser.favCoin !== "" && tokenUser.favCurrency !== "" && currency === "") {
+        const options = makeOptions("GET", true);
+        fetch(
+          baseURL + "/api/crypto/" + tokenUser.favCoin + "/" + tokenUser.favCurrency,
+          options
+        )
+          .then(handleHttpErrors)
+          .then((data) => {
+            console.log(data);
+            setFCoin([{ ...data }]);
+          });
+      } else if (tokenUser.favCoin !== "" && tokenUser.favCurrency !== "") {
+        const options = makeOptions("GET", true);
+        fetch(baseURL + "/api/crypto/" + tokenUser.favCoin + "/" + currency, options)
+          .then(handleHttpErrors)
+          .then((data) => {
+            console.log(data);
+            setFCoin([{ ...data }]);
+          });
+      }
+    },
+    [currency]
+  );
 
   function compare(a, b) {
     if (a < b) return 1;
@@ -131,42 +120,46 @@ export default function AllCoins({ user }) {
       <Col>
         <Currency currency={currency} setCurrency={setCurrency} user={user} />
       </Col>
+      {user.favCurrency !== "" && user.favCoin !== "" ? (
+        <Col>
+          <h1>Favorite coin</h1>
+          <Table>
+            <thead>
+              <tr>
+                <td>
+                  <h4>Name</h4>
+                </td>
+                <td>
+                  <h4>Price</h4>
+                </td>
+                <td>
+                  <h4>Volume</h4>
+                </td>
+                <td>
+                  <h4>Last Update</h4>
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              {fCoin.map((p) => {
+                return (
+                  <tr key={p.name}>
+                    <td>{p.name}</td>
+                    <td>
+                      {p.price} {currency}
+                    </td>
+                    <td>{p.volume}</td>
+                    <td>{p.lastUpdated}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </Col>
+      ) : (
+        <></>
+      )}
 
-      <Col>
-        <h1>Favorite coin</h1>
-        <Table>
-          <thead>
-            <tr>
-              <td>
-                <h4>Name</h4>
-              </td>
-              <td>
-                <h4>Price</h4>
-              </td>
-              <td>
-                <h4>Volume</h4>
-              </td>
-              <td>
-                <h4>Last Update</h4>
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            {fCoin.map((p) => {
-              return (
-                <tr key={p.name}>
-                  <td>{p.name}</td>
-                  <td>
-                    {p.price} {currency}
-                  </td>
-                  <td>{p.volume}</td>
-                  <td>{p.lastUpdated}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </Col>
       <Col>
         <h1>All coins</h1>
         <Table>
