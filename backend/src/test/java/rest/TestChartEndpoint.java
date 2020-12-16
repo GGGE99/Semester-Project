@@ -5,35 +5,31 @@
  */
 package rest;
 
-import DTOs.CoinDTO;
+import entities.Coin;
+import entities.CoinValue;
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
 import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
 import java.net.URI;
+import java.util.Date;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.hamcrest.Matchers;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.notNullValue;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import static rest.LoginEndpointTest.startServer;
 import utils.EMF_Creator;
 
 /**
  *
  * @author baske
  */
-public class CryptoEndpointTest {
+public class TestChartEndpoint {
 
     private static final int SERVER_PORT = 7777;
     private static final String SERVER_URL = "http://localhost/api";
@@ -52,6 +48,18 @@ public class CryptoEndpointTest {
         //This method must be called before you request the EntityManagerFactory
         EMF_Creator.startREST_TestWithDB();
         emf = EMF_Creator.createEntityManagerFactoryForTest();
+        EntityManager em = emf.createEntityManager();
+        
+        Coin coin = new Coin("Bitcoin");
+        
+        coin.addValue(new CoinValue(2000, new Date()));
+        
+        em.getTransaction().begin();
+        em.persist(coin);
+        em.getTransaction().commit();
+        
+        
+        
 
         httpServer = startServer();
         //Setup RestAssured
@@ -63,7 +71,7 @@ public class CryptoEndpointTest {
                 .contentType("application/json")
                 .accept(ContentType.JSON)
                 .when()
-                .get("/crypto/all");
+                .get("/chart");
     }
 
     @AfterAll
@@ -73,86 +81,48 @@ public class CryptoEndpointTest {
 
         httpServer.shutdownNow();
     }
-
     @Test
-    public void testGetAllCoins() {
+    public void testGetChartData() {
         given()
                 .contentType("application/json")
                 .accept(ContentType.JSON)
                 .when()
-                .get("/crypto/all").then()
-                .statusCode(200)
-                .body(notNullValue());
-    }
-
-    @Test
-    public void testGetCoin() {
-        given()
-                .contentType("application/json")
-                .accept(ContentType.JSON)
-                .when()
-                .get("/crypto/Bitcoin").then()
-                .statusCode(200)
-                .body("name", equalTo("Bitcoin"));
-    }
-
-    @Test
-    public void testGetCoinWithCurrency() {
-        given()
-                .contentType("application/json")
-                .accept(ContentType.JSON)
-                .when()
-                .get("/crypto/Bitcoin/USD").then()
-                .statusCode(200)
-                .body("currency", equalTo("USD"))
-                .body("name", equalTo("Bitcoin"));
-    }
-
-    @Test
-    public void testGetAllCoinsWithCurrencies() {
-        given()
-                .contentType("application/json")
-                .accept(ContentType.JSON)
-                .when()
-                .get("/crypto/all/DKK").then()
-                .statusCode(200)
-                //.body(notNullValue())
-                .body(containsString("DKK"));
-    }
-
-    
-    @Test
-    public void testGetEveryCoin() {
-        given()
-                .contentType("application/json")
-                .accept(ContentType.JSON)
-                .when()
-                .get("/crypto/every").then()
+                .get("/chart/data").then()
                 .statusCode(200)
                 .body(notNullValue());
     }
     
-    @Test
-    public void testGetEveryName() {
+        @Test
+    public void testGetChartDataByName() {
         given()
                 .contentType("application/json")
                 .accept(ContentType.JSON)
                 .when()
-                .get("/crypto/every/name").then()
-                .statusCode(200)
-                .body(containsString("Bitcoin"));
-    }
-    
-    @Test
-    @Disabled
-    public void testGetHistoryForCoin() {
-        given()
-                .contentType("application/json")
-                .accept(ContentType.JSON)
-                .when()
-                .get("/crypto/history").then()
+                .get("/chart/Bitcoin").then()
                 .statusCode(200)
                 .body(notNullValue());
     }
-
+    
+        @Test
+    public void testGetCoinsHistory() {
+        given()
+                .contentType("application/json")
+                .accept(ContentType.JSON)
+                .when()
+                .get("/chart/coins").then()
+                .statusCode(200)
+                .body(notNullValue());
+    }
+    
+        @Test
+    public void testGetCoinValues() {
+        given()
+                .contentType("application/json")
+                .accept(ContentType.JSON)
+                .when()
+                .get("/chart/coinvalues").then()
+                .statusCode(200)
+                .body(notNullValue());
+    }
+    
 }
