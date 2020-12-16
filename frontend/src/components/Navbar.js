@@ -6,7 +6,7 @@ import { Redirect } from "react-router";
 import { useState } from "react";
 
 function NavbarShow({ user, logout }) {
-  const history = useHistory()
+  const history = useHistory();
 
   return (
     <Navbar
@@ -22,18 +22,19 @@ function NavbarShow({ user, logout }) {
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse id="responsive-navbar-nav">
         <Nav className="mr-auto">
-          <Link to="/charts" className="nav-link">
-            Charts
-          </Link>
-
           <Link to="/converter" className="nav-link">
             Converter
           </Link>
 
           {localStorage.getItem("jwtToken") ? (
-            <Link to="/profile" className="nav-link">
-              Profile
-            </Link>
+            <>
+              <Link to="/profile" className="nav-link">
+                Profile
+              </Link>
+              <Link to="/charts" className="nav-link">
+                Charts
+              </Link>
+            </>
           ) : (
             <></>
           )}
@@ -54,7 +55,7 @@ function NavbarShow({ user, logout }) {
                 className="btn btn-danger"
                 onClick={() => {
                   logout();
-                  history.push("/")
+                  history.push("/");
                 }}
               >
                 Logout
